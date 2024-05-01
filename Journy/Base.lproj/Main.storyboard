@@ -69,10 +69,11 @@
             </objects>
             <point key="canvasLocation" x="2677" y="-944"/>
         </scene>
-        <!--Tab Bar Controller-->
+        <!--Home Tab Bar View Controller-->
         <scene sceneID="gld-Gg-ynj">
             <objects>
-                <tabBarController id="CKR-JP-hge" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="mainTabBarController" id="CKR-JP-hge" customClass="HomeTabBarViewController" customModule="Journy" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="62B-Mx-12U"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="R9y-KG-8xx">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -194,6 +195,7 @@
                     <connections>
                         <outlet property="emailTextField" destination="SWj-zx-lW8" id="Ins-cz-QlY"/>
                         <outlet property="passwordTextField" destination="CHD-Ng-VwS" id="hXz-86-Kq5"/>
+                        <segue destination="CKR-JP-hge" kind="show" identifier="showTabBarSegue" id="NhH-z9-5fZ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="i5c-0J-3hV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

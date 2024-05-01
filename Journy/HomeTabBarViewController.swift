@@ -1,5 +1,5 @@
 //
-//  HomeViewController.swift
+//  HomeTabBarViewController.swift
 //  Journy
 //
 //  Created by Justin Goi on 1/5/2024.
@@ -7,11 +7,12 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
+class HomeTabBarViewController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.hidesBackButton = true
         // Do any additional setup after loading the view.
     }
     

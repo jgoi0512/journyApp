@@ -328,7 +328,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
     }
     
     // Authentication-related functions
-    func signUp(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func signUp(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             if let error = error {
                 completion(.failure(error))
@@ -338,20 +338,23 @@ class FirebaseController: NSObject, DatabaseProtocol {
                     return
                 }
                 
-                let user = User(id: userID, email: email)
-                self.updateUserProfile(user) { result in
-                    switch result {
-                    case .success:
-                        completion(.success(user))
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
+                print("\(userID) registered account.")
+                completion(.success("placeholder"))
+                
+//                let user = User(id: userID, email: email)
+//                self.updateUserProfile(user) { result in
+//                    switch result {
+//                    case .success:
+//                        completion(.success(user))
+//                    case .failure(let error):
+//                        completion(.failure(error))
+//                    }
+//                }
             }
         }
     }
     
-    func signIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func signIn(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
             if let error = error {
                 completion(.failure(error))
@@ -361,14 +364,17 @@ class FirebaseController: NSObject, DatabaseProtocol {
                     return
                 }
                 
-                self.fetchUserProfile { result in
-                    switch result {
-                    case .success(let user):
-                        completion(.success(user))
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
+                print("\(userID) logged in.")
+                completion(.success("placeholder"))
+                
+//                self.fetchUserProfile { result in
+//                    switch result {
+//                    case .success(let user):
+//                        completion(.success(user))
+//                    case .failure(let error):
+//                        completion(.failure(error))
+//                    }
+//                }
             }
         }
     }

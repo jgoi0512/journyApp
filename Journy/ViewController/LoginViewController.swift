@@ -34,7 +34,7 @@ class LoginViewController: UIViewController {
         databaseController?.signIn(email: email, password: password) { [weak self] result in
             switch result {
                 case .success(let user):
-                    print("User signed in: \(user.email)")
+                    print("User signed in: \(user)")
                     self?.navigateToHomeScreen()
                 case .failure(let error):
                     self?.displayMessage(title: "Sign In Error", message: error.localizedDescription)
@@ -47,8 +47,9 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToHomeScreen() {
-         let homeVC = storyboard?.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
-         navigationController?.pushViewController(homeVC, animated: true)
+//         let homeVC = storyboard?.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
+//         navigationController?.pushViewController(homeVC, animated: true)
+        self.performSegue(withIdentifier: "showTabBarSegue", sender: self)
     }
     
     /*

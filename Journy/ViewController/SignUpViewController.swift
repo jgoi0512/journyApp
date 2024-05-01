@@ -14,8 +14,13 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var profilePictureImageView: UIImageView!
     
+    weak var databaseController: DatabaseProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        databaseController = appDelegate?.databaseController
         
         // Setting up image view to be circular and adding a black border around the image view.
         profilePictureImageView.layer.masksToBounds = true
@@ -42,6 +47,26 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
     }
     
     @IBAction func signUpButtonTapped(_ sender: Any) {
+        guard let name = nameTextField.text, !name.isEmpty, let email = emailTextField.text, !email.isEmpty, let password = passwordTextField.text, !password.isEmpty else {
+                displayMessage(title: "Error", message: "Please fill in all the fields.")
+            
+                return
+            }
+            
+        databaseController?.signUp(email: email, password: password) { authResult in
+            switch authResult {
+            case .success(let user):
+                self.displayMessage(title: "Sign Up Successful", message: "placeholder")
+                self.navigateToHomeScreen()
+            case .failure(let user):
+                self.displayMessage(title: "Sign Up Failure", message: "placeholder")
+            }
+        }
+    }
+    
+    private func navigateToHomeScreen() {
+         let homeVC = storyboard?.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
+         navigationController?.pushViewController(homeVC, animated: true)
     }
     
     /*

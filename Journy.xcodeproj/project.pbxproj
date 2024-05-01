@@ -27,6 +27,7 @@
 		29FADCED2BE2097200C28F63 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCEC2BE2097200C28F63 /* HomeViewController.swift */; };
 		29FADCEF2BE2133D00C28F63 /* UIViewController+displayMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCEE2BE2133D00C28F63 /* UIViewController+displayMessage.swift */; };
 		29FADCF22BE220BF00C28F63 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCF12BE220BF00C28F63 /* SignUpViewController.swift */; };
+		29FADCF42BE230CD00C28F63 /* HomeTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCF32BE230CD00C28F63 /* HomeTabBarViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		29FADCEC2BE2097200C28F63 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		29FADCEE2BE2133D00C28F63 /* UIViewController+displayMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+displayMessage.swift"; sourceTree = "<group>"; };
 		29FADCF12BE220BF00C28F63 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
+		29FADCF32BE230CD00C28F63 /* HomeTabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabBarViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +98,7 @@
 				29FADCDA2BDCAEFA00C28F63 /* GoogleService-Info.plist */,
 				29FADCEC2BE2097200C28F63 /* HomeViewController.swift */,
 				29FADCEE2BE2133D00C28F63 /* UIViewController+displayMessage.swift */,
+				29FADCF32BE230CD00C28F63 /* HomeTabBarViewController.swift */,
 			);
 			path = Journy;
 			sourceTree = "<group>";
@@ -217,6 +220,7 @@
 				29FADCC02BD7363800C28F63 /* SceneDelegate.swift in Sources */,
 				29FADCE62BE1F2AB00C28F63 /* FlightInfo.swift in Sources */,
 				29FADCE82BE1F2D100C28F63 /* Expense.swift in Sources */,
+				29FADCF42BE230CD00C28F63 /* HomeTabBarViewController.swift in Sources */,
 				29FADCED2BE2097200C28F63 /* HomeViewController.swift in Sources */,
 				29FADCDF2BE1F18900C28F63 /* DatabaseProtocol.swift in Sources */,
 				29FADCEA2BE1F35800C28F63 /* User.swift in Sources */,
