@@ -8,14 +8,26 @@
 import UIKit
 
 class HomeViewController: UIViewController {
-
+    
+    var databaseController: DatabaseProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        databaseController = appDelegate?.databaseController
         // Do any additional setup after loading the view.
     }
     
-
+    @IBAction func tempSignOut(_ sender: Any) {
+        databaseController?.signOut() { _ in
+            
+        }
+        print("logged out")
+        let loginVC = storyboard?.instantiateViewController(withIdentifier: "LoginViewController") as! LoginViewController
+        navigationController?.pushViewController(loginVC, animated: true)
+    }
+    
     /*
     // MARK: - Navigation
 

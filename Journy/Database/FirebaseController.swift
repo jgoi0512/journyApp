@@ -22,10 +22,10 @@ class FirebaseController: NSObject, DatabaseProtocol {
         
         Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
             guard let self = self else { return }
-
+            
             if let user = user {
                 self.currentUser = user
-
+                
             } else {
                 self.currentUser = nil
             }
@@ -34,19 +34,19 @@ class FirebaseController: NSObject, DatabaseProtocol {
     
     // Trip-related functions
     func fetchTrips(completion: @escaping (Result<[Trip], Error>) -> Void) {
-//        db.collection("trips").getDocuments { snapshot, error in
-//            if let error = error {
-//                completion(.failure(error))
-//            } else {
-//                let trips = snapshot?.documents.compactMap { document -> Trip? in
-//                    let data = document.data()
-//                    // Parse the trip data and create a Trip instance
-//                    // ...
-//                    return trip
-//                } ?? []
-//                completion(.success(trips))
-//            }
-//        }
+        //        db.collection("trips").getDocuments { snapshot, error in
+        //            if let error = error {
+        //                completion(.failure(error))
+        //            } else {
+        //                let trips = snapshot?.documents.compactMap { document -> Trip? in
+        //                    let data = document.data()
+        //                    // Parse the trip data and create a Trip instance
+        //                    // ...
+        //                    return trip
+        //                } ?? []
+        //                completion(.success(trips))
+        //            }
+        //        }
     }
     
     func addTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -95,19 +95,19 @@ class FirebaseController: NSObject, DatabaseProtocol {
     
     // Expense-related functions
     func fetchExpensesForTrip(_ tripID: String, completion: @escaping (Result<[Expense], Error>) -> Void) {
-//        db.collection("trips").document(tripID).collection("expenses").getDocuments { snapshot, error in
-//            if let error = error {
-//                completion(.failure(error))
-//            } else {
-//                let expenses = snapshot?.documents.compactMap { document -> Expense? in
-//                    let data = document.data()
-//                    // Parse the expense data and create an Expense instance
-//                    // ...
-//                    return expense
-//                } ?? []
-//                completion(.success(expenses))
-//            }
-//        }
+        //        db.collection("trips").document(tripID).collection("expenses").getDocuments { snapshot, error in
+        //            if let error = error {
+        //                completion(.failure(error))
+        //            } else {
+        //                let expenses = snapshot?.documents.compactMap { document -> Expense? in
+        //                    let data = document.data()
+        //                    // Parse the expense data and create an Expense instance
+        //                    // ...
+        //                    return expense
+        //                } ?? []
+        //                completion(.success(expenses))
+        //            }
+        //        }
     }
     
     func addExpense(_ expense: Expense, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -156,19 +156,19 @@ class FirebaseController: NSObject, DatabaseProtocol {
     
     // Flight-related functions
     func fetchFlightInfoForTrip(_ tripID: String, completion: @escaping (Result<FlightInfo?, Error>) -> Void) {
-//        db.collection("trips").document(tripID).collection("flightInfo").getDocuments { snapshot, error in
-//            if let error = error {
-//                completion(.failure(error))
-//            } else {
-//                let flightInfo = snapshot?.documents.first.flatMap { document -> FlightInfo? in
-//                    let data = document.data()
-//                    // Parse the flight info data and create a FlightInfo instance
-//                    // ...
-//                    return flightInfo
-//                }
-//                completion(.success(flightInfo))
-//            }
-//        }
+        //        db.collection("trips").document(tripID).collection("flightInfo").getDocuments { snapshot, error in
+        //            if let error = error {
+        //                completion(.failure(error))
+        //            } else {
+        //                let flightInfo = snapshot?.documents.first.flatMap { document -> FlightInfo? in
+        //                    let data = document.data()
+        //                    // Parse the flight info data and create a FlightInfo instance
+        //                    // ...
+        //                    return flightInfo
+        //                }
+        //                completion(.success(flightInfo))
+        //            }
+        //        }
     }
     
     func addFlightInfo(_ flightInfo: FlightInfo, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -226,19 +226,19 @@ class FirebaseController: NSObject, DatabaseProtocol {
     
     // Destination-related functions
     func fetchDestinationsForTrip(_ tripID: String, completion: @escaping (Result<[Destination], Error>) -> Void) {
-//        db.collection("trips").document(tripID).collection("destinations").getDocuments { snapshot, error in
-//            if let error = error {
-//                completion(.failure(error))
-//            } else {
-//                let destinations = snapshot?.documents.compactMap { document -> Destination? in
-//                    let data = document.data()
-//                    // Parse the destination data and create a Destination instance
-//                    // ...
-//                    return destination
-//                } ?? []
-//                completion(.success(destinations))
-//            }
-//        }
+        //        db.collection("trips").document(tripID).collection("destinations").getDocuments { snapshot, error in
+        //            if let error = error {
+        //                completion(.failure(error))
+        //            } else {
+        //                let destinations = snapshot?.documents.compactMap { document -> Destination? in
+        //                    let data = document.data()
+        //                    // Parse the destination data and create a Destination instance
+        //                    // ...
+        //                    return destination
+        //                } ?? []
+        //                completion(.success(destinations))
+        //            }
+        //        }
     }
     
     func addDestination(_ destination: Destination, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -312,13 +312,15 @@ class FirebaseController: NSObject, DatabaseProtocol {
     }
     
     func updateUserProfile(_ user: User, completion: @escaping (Result<Void, Error>) -> Void) {
+        let userRef = db.collection("users").document(user.id)
+        
         let userData: [String: Any] = [
-            "displayName": user.displayName ?? NSNull(),
-            "profileImageURL": user.profileImageURL?.absoluteString ?? NSNull(),
-            // Add more user data as needed
+            "email": user.email,
+            "displayName": user.displayName ?? "",
+            "profileImageURL": user.profileImageURL?.absoluteString ?? ""
         ]
         
-        db.collection("users").document(user.id).setData(userData, merge: true) { error in
+        userRef.setData(userData) { error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -327,8 +329,8 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    // Authentication-related functions
-    func signUp(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
+    // User auth
+    func signUp(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             if let error = error {
                 completion(.failure(error))
@@ -339,22 +341,21 @@ class FirebaseController: NSObject, DatabaseProtocol {
                 }
                 
                 print("\(userID) registered account.")
-                completion(.success("placeholder"))
                 
-//                let user = User(id: userID, email: email)
-//                self.updateUserProfile(user) { result in
-//                    switch result {
-//                    case .success:
-//                        completion(.success(user))
-//                    case .failure(let error):
-//                        completion(.failure(error))
-//                    }
-//                }
+                let user = User(id: userID, email: email)
+                self.updateUserProfile(user) { result in
+                    switch result {
+                    case .success:
+                        completion(.success(user))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
+                }
             }
         }
     }
-    
-    func signIn(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
+            
+    func signIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
             if let error = error {
                 completion(.failure(error))
@@ -363,22 +364,21 @@ class FirebaseController: NSObject, DatabaseProtocol {
                     completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "User ID not found"])))
                     return
                 }
-                
+                        
                 print("\(userID) logged in.")
-                completion(.success("placeholder"))
-                
-//                self.fetchUserProfile { result in
-//                    switch result {
-//                    case .success(let user):
-//                        completion(.success(user))
-//                    case .failure(let error):
-//                        completion(.failure(error))
-//                    }
-//                }
+                        
+                self.fetchUserProfile { result in
+                    switch result {
+                        case .success(let user):
+                            completion(.success(user))
+                        case .failure(let error):
+                            completion(.failure(error))
+                    }
+                }
             }
         }
     }
-    
+            
     func signOut(completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             try Auth.auth().signOut()
@@ -386,15 +386,5 @@ class FirebaseController: NSObject, DatabaseProtocol {
         } catch {
             completion(.failure(error))
         }
-    }
-    
-    static func isUserLoggedIn() -> Bool {
-        return Auth.auth().currentUser != nil
-    }
-    
-    // Other utility functions
-    func uploadImage(_ image: UIImage, completion: @escaping (Result<URL, Error>) -> Void) {
-        // Implement the logic to upload an image to Firebase Storage and retrieve the download URL
-        // ...
     }
 }

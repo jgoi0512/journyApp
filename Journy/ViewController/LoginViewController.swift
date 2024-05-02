@@ -22,6 +22,8 @@ class LoginViewController: UIViewController {
         
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         databaseController = appDelegate?.databaseController
+        
+        navigationItem.hidesBackButton = true
     }
     
     @IBAction func loginButtonTapped(_ sender: Any) {
@@ -35,7 +37,6 @@ class LoginViewController: UIViewController {
             switch result {
                 case .success(let user):
                     print("User signed in: \(user)")
-                    self?.navigateToHomeScreen()
                 case .failure(let error):
                     self?.displayMessage(title: "Sign In Error", message: error.localizedDescription)
             }
@@ -47,9 +48,26 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToHomeScreen() {
-//         let homeVC = storyboard?.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
-//         navigationController?.pushViewController(homeVC, animated: true)
-        self.performSegue(withIdentifier: "showTabBarSegue", sender: self)
+        print("Navigating to home screen.")
+        let homeVC = storyboard?.instantiateViewController(withIdentifier: "homeTabBarController") as! HomeTabBarViewController
+        navigationController?.pushViewController(homeVC, animated: true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        handle = Auth.auth().addStateDidChangeListener { (auth, user) in
+            if user != nil {
+                print("\(String(describing: user?.uid))")
+                self.navigateToHomeScreen()
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        Auth.auth().removeStateDidChangeListener(handle!)
     }
     
     /*

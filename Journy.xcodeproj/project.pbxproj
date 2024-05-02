@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F947F32BE3278500F1CF23 /* FirebaseStorage */; };
 		29FADCBE2BD7363800C28F63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCBD2BD7363800C28F63 /* AppDelegate.swift */; };
 		29FADCC02BD7363800C28F63 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCBF2BD7363800C28F63 /* SceneDelegate.swift */; };
 		29FADCC52BD7363800C28F63 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 29FADCC42BD7363800C28F63 /* Base */; };
@@ -59,6 +60,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				29FADCD52BD7400900C28F63 /* FirebaseAuth in Frameworks */,
+				29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */,
 				29FADCD72BD7400900C28F63 /* FirebaseFirestore in Frameworks */,
 				29FADCD92BD7400900C28F63 /* FirebaseFirestoreSwift in Frameworks */,
 			);
@@ -153,6 +155,7 @@
 				29FADCD42BD7400900C28F63 /* FirebaseAuth */,
 				29FADCD62BD7400900C28F63 /* FirebaseFirestore */,
 				29FADCD82BD7400900C28F63 /* FirebaseFirestoreSwift */,
+				29F947F32BE3278500F1CF23 /* FirebaseStorage */,
 			);
 			productName = Journy;
 			productReference = 29FADCBA2BD7363800C28F63 /* Journy.app */;
@@ -462,6 +465,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		29F947F32BE3278500F1CF23 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29FADCD32BD7400900C28F63 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		29FADCD42BD7400900C28F63 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 29FADCD32BD7400900C28F63 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

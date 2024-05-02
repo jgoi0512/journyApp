@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseStorage
 
 class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
 
@@ -15,6 +16,12 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
     @IBOutlet weak var profilePictureImageView: UIImageView!
     
     weak var databaseController: DatabaseProtocol?
+    
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +34,9 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
         profilePictureImageView.layer.cornerRadius = profilePictureImageView.frame.height / 2
         profilePictureImageView.layer.borderColor = UIColor.black.cgColor
         profilePictureImageView.layer.borderWidth = 1.5
+        
+        view.addSubview(loadingIndicator)
+        loadingIndicator.center = view.center
     }
     
     @IBAction func uploadImageButtonTapped(_ sender: Any) {
@@ -53,20 +63,79 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
                 return
             }
             
-        databaseController?.signUp(email: email, password: password) { authResult in
-            switch authResult {
+        loadingIndicator.startAnimating()
+        
+        databaseController?.signUp(email: email, password: password) { [weak self] result in
+            switch result {
             case .success(let user):
-                self.displayMessage(title: "Sign Up Successful", message: "placeholder")
-                self.navigateToHomeScreen()
-            case .failure(let user):
-                self.displayMessage(title: "Sign Up Failure", message: "placeholder")
+                // Update user profile with display name and profile image URL
+                user.displayName = name
+                if let profileImage = self?.profilePictureImageView.image {
+                    self?.uploadProfileImage(profileImage, for: user) { result in
+                        print("uploading image")
+                        self?.loadingIndicator.stopAnimating()
+                        switch result {
+                        case .success(let imageURL):
+                            print("successfully uploaded image to firebase storage.")
+                            user.profileImageURL = imageURL
+                            self?.updateUserProfile(user)
+                        case .failure(let error):
+                            print("Error uploading profile image: \(error.localizedDescription)")
+                            self?.updateUserProfile(user)
+                        }
+                    }
+                } else {
+                    self?.updateUserProfile(user)
+                }
+            case .failure(let error):
+                self?.displayMessage(title: "Sign Up Failure", message: error.localizedDescription)
+            }
+        }
+    }
+    
+    private func updateUserProfile(_ user: User) {
+        databaseController?.updateUserProfile(user) { [weak self] result in
+            switch result {
+            case .success:
+                print("successfully updated profile info with name, email and picture URL.")
+                self?.navigateToHomeScreen()
+            case .failure(let error):
+                self?.displayMessage(title: "Profile Update Failure", message: error.localizedDescription)
+            }
+        }
+    }
+    
+    private func uploadProfileImage(_ image: UIImage, for user: User, completion: @escaping (Result<URL, Error>) -> Void) {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to JPEG data"])))
+            return
+        }
+        
+        let storageRef = Storage.storage().reference().child("profile_images/\(user.id).jpg")
+        
+        storageRef.putData(imageData, metadata: nil) { metadata, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                storageRef.downloadURL { url, error in
+                    if let error = error {
+                        completion(.failure(error))
+                    } else if let url = url {
+                        completion(.success(url))
+                    } else {
+                        completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to retrieve download URL"])))
+                    }
+                }
             }
         }
     }
     
     private func navigateToHomeScreen() {
-         let homeVC = storyboard?.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
-         navigationController?.pushViewController(homeVC, animated: true)
+        print("Navigating to home screen.")
+        let homeVC = storyboard?.instantiateViewController(withIdentifier: "homeTabBarController") as! HomeTabBarViewController
+        navigationController?.pushViewController(homeVC, animated: true)
+        
+        displayMessage(title: "Success!", message: "Successfully signed up!")
     }
     
     /*

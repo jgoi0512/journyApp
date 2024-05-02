@@ -41,11 +41,7 @@ protocol DatabaseProtocol: NSObject {
     func updateUserProfile(_ user: User, completion: @escaping (Result<Void, Error>) -> Void)
     
     // Authentication-related functions
-    func signUp(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void)
-    func signIn(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void)
+    func signUp(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void)
+    func signIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void)
     func signOut(completion: @escaping (Result<Void, Error>) -> Void)
-    static func isUserLoggedIn() -> Bool
-    
-    // Other utility functions
-    func uploadImage(_ image: UIImage, completion: @escaping (Result<URL, Error>) -> Void)
 }

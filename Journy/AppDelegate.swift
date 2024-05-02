@@ -7,44 +7,17 @@
 
 import UIKit
 import FirebaseCore
+import FirebaseAuth
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
     var databaseController: DatabaseProtocol?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         databaseController = FirebaseController()
-        
-        window = UIWindow(frame: UIScreen.main.bounds)
-        
-        // Check if the user is already logged in
-        if FirebaseController.isUserLoggedIn() {
-            navigateToHomePage()
-        } else {
-            navigateToLoginPage()
-        }
-        
-        window?.makeKeyAndVisible()
-        
+                
         return true
-    }
-    
-    private func navigateToHomePage() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let homeVC = storyboard.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
-        
-        print("Navigating to home page. User: \(databaseController?.currentUser)")
-        window?.rootViewController = homeVC
-    }
-
-    private func navigateToLoginPage() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginVC = storyboard.instantiateViewController(withIdentifier: "LoginViewController") as! LoginViewController
-        
-        print("Navigating to login page. No user is currently logged in.")
-        window?.rootViewController = loginVC
     }
 
     // MARK: UISceneSession Lifecycle

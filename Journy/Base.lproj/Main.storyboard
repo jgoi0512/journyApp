@@ -60,6 +60,17 @@
                     <view key="view" contentMode="scaleToFill" id="smn-fb-FxE">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bad-01-TvG">
+                                <rect key="frame" x="131" y="306" width="75" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                <connections>
+                                    <action selector="tempSignOut:" destination="xJX-p1-Az3" eventType="touchUpInside" id="XcV-qI-3Sx"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="Ywr-rK-8Nn"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
@@ -72,7 +83,7 @@
         <!--Home Tab Bar View Controller-->
         <scene sceneID="gld-Gg-ynj">
             <objects>
-                <tabBarController storyboardIdentifier="mainTabBarController" id="CKR-JP-hge" customClass="HomeTabBarViewController" customModule="Journy" customModuleProvider="target" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="homeTabBarController" id="CKR-JP-hge" customClass="HomeTabBarViewController" customModule="Journy" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="62B-Mx-12U"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="R9y-KG-8xx">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
@@ -130,7 +141,7 @@
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Username/Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="SWj-zx-lW8">
                                         <rect key="frame" x="0.0" y="0.0" width="356.66666666666669" height="50"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="E46-ca-3mv"/>
+                                            <constraint firstAttribute="height" constant="50" id="lxd-01-Hyj"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <textInputTraits key="textInputTraits"/>
@@ -183,9 +194,6 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="CHD-Ng-VwS" firstAttribute="top" secondItem="SWj-zx-lW8" secondAttribute="bottom" constant="20" id="kfX-rc-noL"/>
-                                </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ljG-i1-KPO"/>
@@ -203,7 +211,6 @@
                     <connections>
                         <outlet property="emailTextField" destination="SWj-zx-lW8" id="Ins-cz-QlY"/>
                         <outlet property="passwordTextField" destination="CHD-Ng-VwS" id="hXz-86-Kq5"/>
-                        <segue destination="CKR-JP-hge" kind="show" identifier="showTabBarSegue" id="NhH-z9-5fZ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="i5c-0J-3hV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -337,10 +344,10 @@
         </scene>
     </scenes>
     <resources>
-        <image name="hand.wave.fill" catalog="system" width="128" height="128"/>
-        <image name="house.fill" catalog="system" width="128" height="104"/>
-        <image name="person.fill" catalog="system" width="128" height="120"/>
-        <image name="safari.fill" catalog="system" width="128" height="123"/>
+        <image name="hand.wave.fill" catalog="system" width="32" height="32"/>
+        <image name="house.fill" catalog="system" width="32" height="32"/>
+        <image name="person.fill" catalog="system" width="32" height="32"/>
+        <image name="safari.fill" catalog="system" width="32" height="32"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
