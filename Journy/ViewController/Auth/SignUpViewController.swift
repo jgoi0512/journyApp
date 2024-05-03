@@ -62,17 +62,19 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
             
                 return
             }
-            
+        
+        self.view.isUserInteractionEnabled = false
         loadingIndicator.startAnimating()
         
         databaseController?.signUp(email: email, password: password) { [weak self] result in
             switch result {
             case .success(let user):
-                // Update user profile with display name and profile image URL
                 user.displayName = name
+                
                 if let profileImage = self?.profilePictureImageView.image {
                     self?.uploadProfileImage(profileImage, for: user) { result in
                         print("uploading image")
+                        self?.view.isUserInteractionEnabled = true
                         self?.loadingIndicator.stopAnimating()
                         switch result {
                         case .success(let imageURL):
@@ -88,6 +90,9 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
                     self?.updateUserProfile(user)
                 }
             case .failure(let error):
+                self?.view.isUserInteractionEnabled = true
+                self?.loadingIndicator.stopAnimating()
+                
                 self?.displayMessage(title: "Sign Up Failure", message: error.localizedDescription)
             }
         }

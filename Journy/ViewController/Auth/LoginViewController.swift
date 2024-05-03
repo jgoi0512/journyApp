@@ -17,6 +17,12 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -24,6 +30,9 @@ class LoginViewController: UIViewController {
         databaseController = appDelegate?.databaseController
         
         navigationItem.hidesBackButton = true
+        
+        view.addSubview(loadingIndicator)
+        loadingIndicator.center = view.center
     }
     
     @IBAction func loginButtonTapped(_ sender: Any) {
@@ -33,10 +42,16 @@ class LoginViewController: UIViewController {
             return
         }
         
+        self.view.isUserInteractionEnabled = false
+        loadingIndicator.startAnimating()
+        
         databaseController?.signIn(email: email, password: password) { [weak self] result in
+            self?.view.isUserInteractionEnabled = true
+            self?.loadingIndicator.stopAnimating()
+            
             switch result {
                 case .success(let user):
-                    print("User signed in: \(user)")
+                print("User signed in: \(user)")
                 case .failure(let error):
                     self?.displayMessage(title: "Sign In Error", message: error.localizedDescription)
             }
@@ -55,6 +70,8 @@ class LoginViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        self.hidesBottomBarWhenPushed = true
         
         handle = Auth.auth().addStateDidChangeListener { (auth, user) in
             if user != nil {

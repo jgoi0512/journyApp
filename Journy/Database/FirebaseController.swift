@@ -32,7 +32,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    // Trip-related functions
+    // Trip
     func fetchTrips(completion: @escaping (Result<[Trip], Error>) -> Void) {
         //        db.collection("trips").getDocuments { snapshot, error in
         //            if let error = error {
@@ -53,8 +53,8 @@ class FirebaseController: NSObject, DatabaseProtocol {
         let tripData: [String: Any] = [
             "title": trip.title,
             "startDate": trip.startDate,
-            "endDate": trip.endDate,
-            // Add more trip data as needed
+            "endDate": trip.endDate
+            // to add
         ]
         
         db.collection("trips").addDocument(data: tripData) { error in
@@ -71,7 +71,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
             "title": trip.title,
             "startDate": trip.startDate,
             "endDate": trip.endDate,
-            // Add more trip data as needed
+            // to add
         ]
         
         db.collection("trips").document(trip.id).setData(tripData, merge: true) { error in
@@ -93,21 +93,20 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    // Expense-related functions
+    // Trip expenses
     func fetchExpensesForTrip(_ tripID: String, completion: @escaping (Result<[Expense], Error>) -> Void) {
-        //        db.collection("trips").document(tripID).collection("expenses").getDocuments { snapshot, error in
-        //            if let error = error {
-        //                completion(.failure(error))
-        //            } else {
-        //                let expenses = snapshot?.documents.compactMap { document -> Expense? in
-        //                    let data = document.data()
-        //                    // Parse the expense data and create an Expense instance
-        //                    // ...
-        //                    return expense
-        //                } ?? []
-        //                completion(.success(expenses))
-        //            }
-        //        }
+//                db.collection("trips").document(tripID).collection("expenses").getDocuments { snapshot, error in
+//                    if let error = error {
+//                        completion(.failure(error))
+//                    } else {
+//                        let expenses = snapshot?.documents.compactMap { document -> Expense? in
+//                            let data = document.data()
+//                            // to add...
+//                              return expense
+//                        } ?? []
+//                        completion(.success(expenses))
+//                    }
+//                }
     }
     
     func addExpense(_ expense: Expense, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -115,7 +114,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
             "title": expense.title,
             "amount": expense.amount,
             "date": expense.date,
-            // Add more expense data as needed
+            // to add
         ]
         
         db.collection("trips").document(tripID).collection("expenses").addDocument(data: expenseData) { error in
@@ -132,7 +131,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
             "title": expense.title,
             "amount": expense.amount,
             "date": expense.date,
-            // Add more expense data as needed
+            // to add
         ]
         
         db.collection("expenses").document(expense.id).setData(expenseData, merge: true) { error in
@@ -154,7 +153,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    // Flight-related functions
+    // Trip flight
     func fetchFlightInfoForTrip(_ tripID: String, completion: @escaping (Result<FlightInfo?, Error>) -> Void) {
         //        db.collection("trips").document(tripID).collection("flightInfo").getDocuments { snapshot, error in
         //            if let error = error {
@@ -162,8 +161,8 @@ class FirebaseController: NSObject, DatabaseProtocol {
         //            } else {
         //                let flightInfo = snapshot?.documents.first.flatMap { document -> FlightInfo? in
         //                    let data = document.data()
-        //                    // Parse the flight info data and create a FlightInfo instance
-        //                    // ...
+        //                    //
+        //                    // to implement
         //                    return flightInfo
         //                }
         //                completion(.success(flightInfo))
@@ -179,7 +178,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
             "arrivalAirport": flightInfo.arrivalAirport,
             "departureDate": flightInfo.departureDate,
             "arrivalDate": flightInfo.arrivalDate,
-            // Add more flight info data as needed
+            // to add more data
         ]
         
         db.collection("trips").document(tripID).collection("flightInfo").addDocument(data: flightData) { error in
@@ -199,7 +198,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
             "arrivalAirport": flightInfo.arrivalAirport,
             "departureDate": flightInfo.departureDate,
             "arrivalDate": flightInfo.arrivalDate,
-            // Add more flight info data as needed
+            // to add
         ]
         
         db.collection("flightInfo").document(flightInfo.id).setData(flightData, merge: true) { error in
@@ -224,7 +223,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    // Destination-related functions
+    // Trip destinations
     func fetchDestinationsForTrip(_ tripID: String, completion: @escaping (Result<[Destination], Error>) -> Void) {
         //        db.collection("trips").document(tripID).collection("destinations").getDocuments { snapshot, error in
         //            if let error = error {
@@ -232,8 +231,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         //            } else {
         //                let destinations = snapshot?.documents.compactMap { document -> Destination? in
         //                    let data = document.data()
-        //                    // Parse the destination data and create a Destination instance
-        //                    // ...
+        //                    // to add
         //                    return destination
         //                } ?? []
         //                completion(.success(destinations))
@@ -246,7 +244,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
             "name": destination.name,
             "startDate": destination.startDate,
             "endDate": destination.endDate,
-            // Add more destination data as needed
+            // to add
         ]
         
         db.collection("trips").document(tripID).collection("destinations").addDocument(data: destinationData) { error in
@@ -263,7 +261,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
             "name": destination.name,
             "startDate": destination.startDate,
             "endDate": destination.endDate,
-            // Add more destination data as needed
+            // to add
         ]
         
         db.collection("destinations").document(destination.id).setData(destinationData, merge: true) { error in
@@ -285,7 +283,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    // User-related functions
+    // User profiles
     func fetchUserProfile(completion: @escaping (Result<User, Error>) -> Void) {
         guard let userID = Auth.auth().currentUser?.uid else {
             completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
