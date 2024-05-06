@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */; };
 		29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F947F32BE3278500F1CF23 /* FirebaseStorage */; };
 		29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F947F52BE3525700F1CF23 /* AddTripViewController.swift */; };
-		29F947F82BE3531F00F1CF23 /* TripCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F947F72BE3531F00F1CF23 /* TripCollectionViewCell.swift */; };
 		29FADCBE2BD7363800C28F63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCBD2BD7363800C28F63 /* AppDelegate.swift */; };
 		29FADCC02BD7363800C28F63 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCBF2BD7363800C28F63 /* SceneDelegate.swift */; };
 		29FADCC52BD7363800C28F63 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 29FADCC42BD7363800C28F63 /* Base */; };
@@ -34,8 +34,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailTableViewCell.swift; sourceTree = "<group>"; };
 		29F947F52BE3525700F1CF23 /* AddTripViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripViewController.swift; sourceTree = "<group>"; };
-		29F947F72BE3531F00F1CF23 /* TripCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCollectionViewCell.swift; sourceTree = "<group>"; };
 		29FADCBA2BD7363800C28F63 /* Journy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Journy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		29FADCBD2BD7363800C28F63 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		29FADCBF2BD7363800C28F63 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -86,8 +86,8 @@
 			isa = PBXGroup;
 			children = (
 				29FADCF32BE230CD00C28F63 /* HomeTabBarViewController.swift */,
-				29F947F72BE3531F00F1CF23 /* TripCollectionViewCell.swift */,
 				29FADCEC2BE2097200C28F63 /* HomeViewController.swift */,
+				297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */,
 			);
 			path = "Home Page";
 			sourceTree = "<group>";
@@ -98,6 +98,15 @@
 				29F947F52BE3525700F1CF23 /* AddTripViewController.swift */,
 			);
 			path = "Add Trip";
+			sourceTree = "<group>";
+		};
+		297225252BE8EEA00013FC0D /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				29FADCC32BD7363800C28F63 /* Main.storyboard */,
+				29FADCC82BD7363900C28F63 /* LaunchScreen.storyboard */,
+			);
+			path = Storyboards;
 			sourceTree = "<group>";
 		};
 		29FADCB12BD7363800C28F63 = {
@@ -122,11 +131,10 @@
 				29FADCF02BE218C700C28F63 /* ViewController */,
 				29FADCEB2BE1F35F00C28F63 /* Models */,
 				29FADCE02BE1F23B00C28F63 /* Database */,
+				297225252BE8EEA00013FC0D /* Storyboards */,
 				29FADCBD2BD7363800C28F63 /* AppDelegate.swift */,
 				29FADCBF2BD7363800C28F63 /* SceneDelegate.swift */,
 				29FADCC62BD7363900C28F63 /* Assets.xcassets */,
-				29FADCC32BD7363800C28F63 /* Main.storyboard */,
-				29FADCC82BD7363900C28F63 /* LaunchScreen.storyboard */,
 				29FADCCB2BD7363900C28F63 /* Info.plist */,
 				29FADCDA2BDCAEFA00C28F63 /* GoogleService-Info.plist */,
 				29FADCEE2BE2133D00C28F63 /* UIViewController+displayMessage.swift */,
@@ -259,7 +267,7 @@
 				29FADCDF2BE1F18900C28F63 /* DatabaseProtocol.swift in Sources */,
 				29FADCEA2BE1F35800C28F63 /* User.swift in Sources */,
 				29FADCE42BE1F29100C28F63 /* Destination.swift in Sources */,
-				29F947F82BE3531F00F1CF23 /* TripCollectionViewCell.swift in Sources */,
+				297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */,
 				29FADCF22BE220BF00C28F63 /* SignUpViewController.swift in Sources */,
 				29FADCEF2BE2133D00C28F63 /* UIViewController+displayMessage.swift in Sources */,
 			);

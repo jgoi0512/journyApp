@@ -6,17 +6,46 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    var handle: AuthStateDidChangeListenerHandle?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        window = UIWindow(windowScene: windowScene)
+        let sb = UIStoryboard(name: "Main", bundle: nil)
+        
+        handle = Auth.auth().addStateDidChangeListener { (auth, user) in
+            if user != nil {
+                print("\(user!.email!) with UID: \(user!.uid) logged in.")
+                let homeTabBarVC = sb.instantiateViewController(withIdentifier: "homeTabBarController") as! HomeTabBarViewController
+                self.window?.rootViewController = homeTabBarVC
+                self.window?.makeKeyAndVisible()
+            }
+            else {
+                print("No user is currently logged in.")
+                let loginVC = sb.instantiateViewController(withIdentifier: "loginViewController")
+                self.window?.rootViewController = loginVC
+                self.window?.makeKeyAndVisible()
+            }
+        }
+    }
+    
+    func setRootViewController(_ vc: UIViewController, _ userId: Int? = nil) {
+         if let window = self.window {
+             window.rootViewController = vc
+             
+             UIView.transition(with: window,
+                               duration: 0.5,
+                               options: .transitionCrossDissolve,
+                               animations: nil)
+         }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
