@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29434C422BED8AD000CCE431 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29434C412BED8AD000CCE431 /* ProfileViewController.swift */; };
 		297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */; };
 		29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F947F32BE3278500F1CF23 /* FirebaseStorage */; };
 		29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F947F52BE3525700F1CF23 /* AddTripViewController.swift */; };
@@ -34,6 +35,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		29434C412BED8AD000CCE431 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailTableViewCell.swift; sourceTree = "<group>"; };
 		29F947F52BE3525700F1CF23 /* AddTripViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripViewController.swift; sourceTree = "<group>"; };
 		29FADCBA2BD7363800C28F63 /* Journy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Journy.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,6 +75,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		29434C402BED8AB200CCE431 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				29434C412BED8AD000CCE431 /* ProfileViewController.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		2960ED262BE49B0A002C399C /* Auth */ = {
 			isa = PBXGroup;
 			children = (
@@ -166,6 +176,7 @@
 		29FADCF02BE218C700C28F63 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				29434C402BED8AB200CCE431 /* Profile */,
 				2960ED282BE49B36002C399C /* Add Trip */,
 				2960ED272BE49B15002C399C /* Home Page */,
 				2960ED262BE49B0A002C399C /* Auth */,
@@ -261,6 +272,7 @@
 				29FADCC02BD7363800C28F63 /* SceneDelegate.swift in Sources */,
 				29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */,
 				29FADCE62BE1F2AB00C28F63 /* FlightInfo.swift in Sources */,
+				29434C422BED8AD000CCE431 /* ProfileViewController.swift in Sources */,
 				29FADCE82BE1F2D100C28F63 /* Expense.swift in Sources */,
 				29FADCF42BE230CD00C28F63 /* HomeTabBarViewController.swift in Sources */,
 				29FADCED2BE2097200C28F63 /* HomeViewController.swift in Sources */,

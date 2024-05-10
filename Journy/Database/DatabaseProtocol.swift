@@ -9,9 +9,7 @@ import Foundation
 import UIKit
 import Firebase
 
-protocol DatabaseProtocol: NSObject {
-    var currentUser: FirebaseAuth.User? { get set }
-    
+protocol DatabaseProtocol: NSObject {    
     // Trip
     func fetchTrips(completion: @escaping (Result<[Trip], Error>) -> Void)
     func addTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void)

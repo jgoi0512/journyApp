@@ -24,12 +24,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         handle = Auth.auth().addStateDidChangeListener { (auth, user) in
             if user != nil {
                 print("\(user!.email!) with UID: \(user!.uid) logged in.")
+                
                 let homeTabBarVC = sb.instantiateViewController(withIdentifier: "homeTabBarController") as! HomeTabBarViewController
                 self.window?.rootViewController = homeTabBarVC
                 self.window?.makeKeyAndVisible()
             }
             else {
                 print("No user is currently logged in.")
+                
                 let loginVC = sb.instantiateViewController(withIdentifier: "loginViewController")
                 self.window?.rootViewController = loginVC
                 self.window?.makeKeyAndVisible()

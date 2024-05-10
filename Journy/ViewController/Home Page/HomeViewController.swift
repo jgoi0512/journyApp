@@ -31,12 +31,11 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         tripTableView.dataSource = self
         tripTableView.delegate = self
-                
+                        
         self.trips = sampleTrips
     }
     
     @IBAction func addTripButtonPressed(_ sender: Any) {
-        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -49,18 +48,9 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let trip = trips[indexPath.row]
         cell.tripImage.backgroundColor = .green
         cell.tripName.text = trip.title
-        cell.tripDate.text = "\(trip.startDate) - \(trip.endDate)"
+        cell.tripDate.text = "\(trip.startDate.formatted(date: .complete, time: .omitted)) - \(trip.endDate.formatted(date: .complete, time: .omitted))"
         
         return cell
-    }
-    
-    @IBAction func tempSignOut(_ sender: Any) {
-        databaseController?.signOut() { _ in }
-        
-        print("User logged out.")
-        let sb = UIStoryboard(name: "Main", bundle: nil)
-        let loginVC = sb.instantiateViewController(identifier: "loginViewController")
-        (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.setRootViewController(loginVC)
     }
     
     /*

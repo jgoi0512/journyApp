@@ -11,25 +11,12 @@ import FirebaseFirestoreSwift
 
 class FirebaseController: NSObject, DatabaseProtocol {
     var db: Firestore
-    var currentUser: FirebaseAuth.User?
-    
     
     override init() {
         FirebaseApp.configure()
         db = Firestore.firestore()
         
         super.init()
-        
-        Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
-            guard let self = self else { return }
-            
-            if let user = user {
-                self.currentUser = user
-                
-            } else {
-                self.currentUser = nil
-            }
-        }
     }
     
     // Trip
