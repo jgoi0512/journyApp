@@ -6,22 +6,17 @@
 //
 
 import UIKit
+import FirebaseAuth
 
-class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIContextMenuInteractionDelegate {
     var databaseController: DatabaseProtocol?
+    
+    private let pexelsApiKey = "zJkVxec43HQGnIY8OLdwElRk5WWVgntjajfMHeZ7SRWNoQkYuKgCC2Zi"
     
     @IBOutlet weak var tripTableView: UITableView!
     @IBOutlet weak var addTripButton: UIButton!
     
     var trips: [Trip] = []
-    
-    let sampleTrips: [Trip] = [
-        Trip(id: "1", title: "Paris Getaway", startDate: Date(), endDate: Date().addingTimeInterval(60 * 60 * 24 * 5), imageURL: URL(string: "https://example.com/paris.jpg")),
-        Trip(id: "2", title: "Beach Vacation", startDate: Date().addingTimeInterval(60 * 60 * 24 * 7), endDate: Date().addingTimeInterval(60 * 60 * 24 * 14), imageURL: URL(string: "https://example.com/beach.jpg")),
-        Trip(id: "3", title: "Mountain Retreat", startDate: Date().addingTimeInterval(60 * 60 * 24 * 21), endDate: Date().addingTimeInterval(60 * 60 * 24 * 28), imageURL: URL(string: "https://example.com/mountain.jpg")),
-        Trip(id: "4", title: "City Exploration", startDate: Date().addingTimeInterval(60 * 60 * 24 * 30), endDate: Date().addingTimeInterval(60 * 60 * 24 * 35), imageURL: URL(string: "https://example.com/city.jpg")),
-        Trip(id: "5", title: "Countryside Escape", startDate: Date().addingTimeInterval(60 * 60 * 24 * 40), endDate: Date().addingTimeInterval(60 * 60 * 24 * 45), imageURL: URL(string: "https://example.com/countryside.jpg"))
-    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,8 +26,22 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         tripTableView.dataSource = self
         tripTableView.delegate = self
-                        
-        self.trips = sampleTrips
+        
+        databaseController?.addTripListener { [weak self] result in
+            switch result {
+            case .success(let trips):
+                self?.trips = trips
+                DispatchQueue.main.async {
+                    self?.tripTableView.reloadData()
+                }
+            case .failure(let error):
+                print("Error listening for trips: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)        
     }
     
     @IBAction func addTripButtonPressed(_ sender: Any) {
@@ -46,21 +55,119 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let cell = tableView.dequeueReusableCell(withIdentifier: "tripDetailCell", for: indexPath) as! TripDetailTableViewCell
         
         let trip = trips[indexPath.row]
-        cell.tripImage.backgroundColor = .green
+        
+        if let imageURL = URL(string: trip.imageURL ?? "") {
+            downloadImage(from: imageURL) { image in
+                DispatchQueue.main.async {
+                    cell.tripImage.image = image
+                }
+            }
+        } else {
+            cell.tripImage.backgroundColor = .green // Fallback color if image URL is invalid
+        }
+        
         cell.tripName.text = trip.title
         cell.tripDate.text = "\(trip.startDate.formatted(date: .complete, time: .omitted)) - \(trip.endDate.formatted(date: .complete, time: .omitted))"
+        
+        cell.addInteraction(UIContextMenuInteraction(delegate: self))
         
         return cell
     }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
-    */
+    
+    func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil else {
+                completion(nil)
+                return
+            }
+            
+            if let image = UIImage(data: data) {
+                let croppedImage = self.cropToAspectRatio(image: image, aspectRatio: 16.0/9.0)
+                completion(croppedImage)
+            } else {
+                completion(nil)
+            }
+        }.resume()
+    }
+    
+    func cropToAspectRatio(image: UIImage, aspectRatio: CGFloat) -> UIImage? {
+        let imageWidth = image.size.width
+        let imageHeight = image.size.height
+        let imageAspectRatio = imageWidth / imageHeight
+        
+        var newWidth: CGFloat
+        var newHeight: CGFloat
+        
+        if imageAspectRatio > aspectRatio {
+            newWidth = imageHeight * aspectRatio
+            newHeight = imageHeight
+        } else {
+            newWidth = imageWidth
+            newHeight = imageWidth / aspectRatio
+        }
+        
+        let x = (imageWidth - newWidth) / 2.0
+        let y = (imageHeight - newHeight) / 2.0
+        
+        let cropRect = CGRect(x: x, y: y, width: newWidth, height: newHeight)
+        
+        if let cgImage = image.cgImage?.cropping(to: cropRect) {
+            return UIImage(cgImage: cgImage)
+        } else {
+            return nil
+        }
+    }
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        guard let cell = interaction.view as? TripDetailTableViewCell,
+              let indexPath = tripTableView.indexPath(for: cell) else {
+            return nil
+        }
+        
+        let trip = trips[indexPath.row]
+        
+        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash"), attributes: .destructive) { [weak self] _ in
+            self?.deleteTrip(trip)
+        }
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            UIMenu(title: "", children: [deleteAction])
+        }
+    }
+    
+    func deleteTrip(_ trip: Trip) {
+        databaseController?.deleteTrip(trip) { [weak self] result in
+            switch result {
+            case .success:
+                // Remove the trip from the local array
+                print("successfully deleted trip")
+                if let index = self?.trips.firstIndex(where: { $0.id == trip.id }) {
+                    self?.trips.remove(at: index)
+                    
+                    // Update the table view on the main queue
+                    DispatchQueue.main.async {
+                        self?.tripTableView.reloadData()
+                    }
+                }
+            case .failure(let error):
+                print("Error deleting trip: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showTripDetail" {
+            if let indexPath = tripTableView.indexPathForSelectedRow {
+                let trip = trips[indexPath.row]
+                let destinationVC = segue.destination as! TripDetailViewController
+                destinationVC.currentTrip = trip
+                destinationVC.navigationItem.title = trip.title
+            }
+        }
+    }
 
 }

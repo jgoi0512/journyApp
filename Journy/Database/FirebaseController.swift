@@ -11,57 +11,89 @@ import FirebaseFirestoreSwift
 
 class FirebaseController: NSObject, DatabaseProtocol {
     var db: Firestore
+    var currentUser: FirebaseAuth.User?
+    
+    var tripRef: CollectionReference?
     
     override init() {
         FirebaseApp.configure()
         db = Firestore.firestore()
         
         super.init()
+        
+        Auth.auth().addStateDidChangeListener { (auth, user) in
+            if user != nil {
+                print("Current logged in user: \(String(describing: user?.uid))")
+                
+                self.currentUser = user
+                self.tripRef = self.db.collection("users").document(self.currentUser?.uid ?? "").collection("trips")
+            }
+        }
     }
     
     // Trip
     func fetchTrips(completion: @escaping (Result<[Trip], Error>) -> Void) {
-        //        db.collection("trips").getDocuments { snapshot, error in
-        //            if let error = error {
-        //                completion(.failure(error))
-        //            } else {
-        //                let trips = snapshot?.documents.compactMap { document -> Trip? in
-        //                    let data = document.data()
-        //                    // Parse the trip data and create a Trip instance
-        //                    // ...
-        //                    return trip
-        //                } ?? []
-        //                completion(.success(trips))
-        //            }
-        //        }
+        tripRef?.addSnapshotListener { snapshot, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let trips = snapshot?.documents.compactMap { document -> Trip? in
+                    let data = document.data()
+                    guard let id = data["id"] as? String,
+                          let title = data["title"] as? String,
+                          let startDate = (data["startDate"] as? Timestamp)?.dateValue(),
+                          let endDate = (data["endDate"] as? Timestamp)?.dateValue(),
+                          let location = data["location"] as? String,
+                          let imageURL = data["imageURL"] as? String
+                    else {
+                        print("failed")
+                        return nil
+                    }
+                                        
+                    let trip = Trip(id: id, title: title, location: location, startDate: startDate, endDate: endDate, imageURL: imageURL)
+                    
+                    return trip
+                } ?? []
+                completion(.success(trips))
+            }
+        }
     }
     
     func addTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void) {
         let tripData: [String: Any] = [
             "title": trip.title,
             "startDate": trip.startDate,
-            "endDate": trip.endDate
-            // to add
+            "endDate": trip.endDate,
+            "location": trip.location,
+            "imageURL": trip.imageURL ?? ""
         ]
         
-        db.collection("trips").addDocument(data: tripData) { error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                completion(.success(()))
+        print("firebasecontroller: \(trip.imageURL)")
+        
+        if let tripRef = tripRef?.addDocument(data: tripData) {
+            let updatedTrip = Trip(id: tripRef.documentID, title: trip.title, location: trip.location, startDate: trip.startDate, endDate: trip.endDate)
+            self.updateTrip(updatedTrip) { result in
+                switch result {
+                case .success:
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+                
             }
         }
     }
     
     func updateTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void) {
         let tripData: [String: Any] = [
+            "id": trip.id,
             "title": trip.title,
             "startDate": trip.startDate,
             "endDate": trip.endDate,
-            // to add
+            "location": trip.location
         ]
         
-        db.collection("trips").document(trip.id).setData(tripData, merge: true) { error in
+        tripRef?.document(trip.id).setData(tripData, merge: true) { error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -71,11 +103,36 @@ class FirebaseController: NSObject, DatabaseProtocol {
     }
     
     func deleteTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void) {
-        db.collection("trips").document(trip.id).delete { error in
+        tripRef?.document(trip.id).delete { error in
             if let error = error {
                 completion(.failure(error))
             } else {
                 completion(.success(()))
+            }
+        }
+    }
+    
+    func addTripListener(completion: @escaping (Result<[Trip], any Error>) -> Void) {
+        tripRef?.addSnapshotListener { snapshot, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let trips = snapshot?.documents.compactMap { document -> Trip? in
+                    let data = document.data()
+                    guard let id = data["id"] as? String,
+                          let title = data["title"] as? String,
+                          let startDate = (data["startDate"] as? Timestamp)?.dateValue(),
+                          let endDate = (data["endDate"] as? Timestamp)?.dateValue(),
+                          let location = data["location"] as? String,
+                          let imageURL = data["imageURL"] as? String else {
+                        return nil
+                    }
+                    
+                    let trip = Trip(id: id, title: title, location: location, startDate: startDate, endDate: endDate, imageURL: imageURL)
+                    
+                    return trip
+                } ?? []
+                completion(.success(trips))
             }
         }
     }
@@ -159,16 +216,11 @@ class FirebaseController: NSObject, DatabaseProtocol {
     
     func addFlightInfo(_ flightInfo: FlightInfo, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let flightData: [String: Any] = [
-            "airline": flightInfo.airline,
             "flightNumber": flightInfo.flightNumber,
-            "departureAirport": flightInfo.departureAirport,
-            "arrivalAirport": flightInfo.arrivalAirport,
-            "departureDate": flightInfo.departureDate,
-            "arrivalDate": flightInfo.arrivalDate,
-            // to add more data
+            "departureDate": flightInfo.departureDate
         ]
         
-        db.collection("trips").document(tripID).collection("flightInfo").addDocument(data: flightData) { error in
+        tripRef?.document(tripID).updateData(["flightInfo": flightData]) { error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -211,7 +263,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
     }
     
     // Trip destinations
-    func fetchDestinationsForTrip(_ tripID: String, completion: @escaping (Result<[Destination], Error>) -> Void) {
+    func fetchDestinationsForTrip(_ tripID: String, completion: @escaping (Result<[Activity], Error>) -> Void) {
         //        db.collection("trips").document(tripID).collection("destinations").getDocuments { snapshot, error in
         //            if let error = error {
         //                completion(.failure(error))
@@ -226,7 +278,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         //        }
     }
     
-    func addDestination(_ destination: Destination, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func addDestination(_ destination: Activity, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let destinationData: [String: Any] = [
             "name": destination.name,
             "startDate": destination.startDate,
@@ -243,7 +295,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    func updateDestination(_ destination: Destination, completion: @escaping (Result<Void, Error>) -> Void) {
+    func updateDestination(_ destination: Activity, completion: @escaping (Result<Void, Error>) -> Void) {
         let destinationData: [String: Any] = [
             "name": destination.name,
             "startDate": destination.startDate,
@@ -260,7 +312,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    func deleteDestination(_ destination: Destination, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func deleteDestination(_ destination: Activity, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
         db.collection("trips").document(tripID).collection("destinations").document(destination.id).delete { error in
             if let error = error {
                 completion(.failure(error))
@@ -271,7 +323,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
     }
     
     // User profiles
-    func fetchUserProfile(completion: @escaping (Result<User, Error>) -> Void) {
+    func fetchUserProfile(completion: @escaping (Result<AuthUser, Error>) -> Void) {
         guard let userID = Auth.auth().currentUser?.uid else {
             completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
             return
@@ -290,13 +342,13 @@ class FirebaseController: NSObject, DatabaseProtocol {
                 let displayName = data["displayName"] as? String
                 let profileImageURL = data["profileImageURL"] as? String
                 
-                let user = User(id: userID, email: email, displayName: displayName, profileImageURL: URL(string: profileImageURL ?? ""))
+                let user = AuthUser(id: userID, email: email, displayName: displayName, profileImageURL: URL(string: profileImageURL ?? ""))
                 completion(.success(user))
             }
         }
     }
     
-    func updateUserProfile(_ user: User, completion: @escaping (Result<Void, Error>) -> Void) {
+    func updateUserProfile(_ user: AuthUser, completion: @escaping (Result<Void, Error>) -> Void) {
         let userRef = db.collection("users").document(user.id)
         
         let userData: [String: Any] = [
@@ -315,7 +367,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
     }
     
     // User auth
-    func signUp(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func signUp(email: String, password: String, completion: @escaping (Result<AuthUser, Error>) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             if let error = error {
                 completion(.failure(error))
@@ -327,7 +379,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
                 
                 print("\(userID) registered account.")
                 
-                let user = User(id: userID, email: email)
+                let user = AuthUser(id: userID, email: email)
                 self.updateUserProfile(user) { result in
                     switch result {
                     case .success:
@@ -340,7 +392,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
             
-    func signIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func signIn(email: String, password: String, completion: @escaping (Result<AuthUser, Error>) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
             if let error = error {
                 completion(.failure(error))
@@ -349,9 +401,7 @@ class FirebaseController: NSObject, DatabaseProtocol {
                     completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "User ID not found"])))
                     return
                 }
-                        
-                print("\(userID) logged in.")
-                        
+                                                
                 self.fetchUserProfile { result in
                     switch result {
                         case .success(let user):

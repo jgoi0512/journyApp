@@ -10,16 +10,19 @@ import Foundation
 class Trip: NSObject {
     let id: String
     let title: String
+    let location: String
     let startDate: Date
     let endDate: Date
-    let imageURL: URL?
+    let imageURL: String?
     var expenses: [Expense] = []
     var flightInfo: FlightInfo?
-    var destinations: [Destination] = []
+    var destinations: [Activity] = []
+    var accommodations: [Accommodation] = []
     
-    init(id: String, title: String, startDate: Date, endDate: Date, imageURL: URL?) {
+    init(id: String = "", title: String, location: String, startDate: Date, endDate: Date, imageURL: String = "") {
         self.id = id
         self.title = title
+        self.location = location
         self.startDate = startDate
         self.endDate = endDate
         self.imageURL = imageURL
@@ -36,7 +39,7 @@ class Trip: NSObject {
     }
     
     // Method to add a destination to the trip
-    func addDestination(_ destination: Destination) {
+    func addDestination(_ destination: Activity) {
         destinations.append(destination)
     }
 }

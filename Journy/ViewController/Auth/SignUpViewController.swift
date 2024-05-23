@@ -98,7 +98,7 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
         }
     }
     
-    private func updateUserProfile(_ user: User) {
+    private func updateUserProfile(_ user: AuthUser) {
         databaseController?.updateUserProfile(user) { [weak self] result in
             switch result {
             case .success:
@@ -110,7 +110,7 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
         }
     }
     
-    private func uploadProfileImage(_ image: UIImage, for user: User, completion: @escaping (Result<URL, Error>) -> Void) {
+    private func uploadProfileImage(_ image: UIImage, for user: AuthUser, completion: @escaping (Result<URL, Error>) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to JPEG data"])))
             return

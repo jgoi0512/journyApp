@@ -11,7 +11,7 @@ import FirebaseStorage
 class ProfileViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     var databaseController: DatabaseProtocol?
     
-    var currentUser: User?
+    var currentUser: AuthUser?
     var userDisplayName: String?
     var userEmail: String?
 
@@ -138,7 +138,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         }
     }
     
-    func updateUserProfile(user: User) {
+    func updateUserProfile(user: AuthUser) {
         databaseController?.updateUserProfile(user) { result in
             switch result {
             case .success:
@@ -168,7 +168,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate &
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editButtonTapped))
     }
     
-    private func uploadProfileImage(_ image: UIImage, for user: User, completion: @escaping (Result<URL, Error>) -> Void) {
+    private func uploadProfileImage(_ image: UIImage, for user: AuthUser, completion: @escaping (Result<URL, Error>) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to JPEG data"])))
             return
