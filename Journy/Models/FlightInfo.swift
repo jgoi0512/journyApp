@@ -7,14 +7,14 @@
 
 import Foundation
 
-class FlightInfo {
+class FlightInfo: NSObject {
     let id: String
-    let airline: String = ""
-    let flightNumber: String
-    let departureAirport: String = ""
-    let arrivalAirport: String = ""
-    let departureDate: Date
-    let arrivalDate: Date = Date()
+    var airline: String = ""
+    var flightNumber: String
+    var departureAirport: String = ""
+    var arrivalAirport: String = ""
+    var departureDate: Date
+    var arrivalDate: Date = Date()
 
     init(id: String, flightNumber: String, departureDate: Date) {
         self.id = id

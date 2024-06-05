@@ -14,6 +14,7 @@
 		292FFA862BF5A11F008494AB /* WeatherDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292FFA852BF5A11F008494AB /* WeatherDetailTableViewCell.swift */; };
 		29434C422BED8AD000CCE431 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29434C412BED8AD000CCE431 /* ProfileViewController.swift */; };
 		29434C452BF3933700CCE431 /* TripDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29434C442BF3933700CCE431 /* TripDetailViewController.swift */; };
+		2951A1962C0D730D00F11A40 /* FlightDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */; };
 		297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */; };
 		29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F947F32BE3278500F1CF23 /* FirebaseStorage */; };
 		29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F947F52BE3525700F1CF23 /* AddTripViewController.swift */; };
@@ -48,6 +49,7 @@
 		292FFA852BF5A11F008494AB /* WeatherDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDetailTableViewCell.swift; sourceTree = "<group>"; };
 		29434C412BED8AD000CCE431 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		29434C442BF3933700CCE431 /* TripDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailViewController.swift; sourceTree = "<group>"; };
+		2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailTableViewCell.swift; sourceTree = "<group>"; };
 		297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailTableViewCell.swift; sourceTree = "<group>"; };
 		29F947F52BE3525700F1CF23 /* AddTripViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripViewController.swift; sourceTree = "<group>"; };
 		29FADCBA2BD7363800C28F63 /* Journy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Journy.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,6 +103,7 @@
 				29434C442BF3933700CCE431 /* TripDetailViewController.swift */,
 				292FFA812BF4310F008494AB /* AddPlanViewController.swift */,
 				292FFA852BF5A11F008494AB /* WeatherDetailTableViewCell.swift */,
+				2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */,
 			);
 			path = "Trip Detail";
 			sourceTree = "<group>";
@@ -313,6 +316,7 @@
 				297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */,
 				29FADCF22BE220BF00C28F63 /* SignUpViewController.swift in Sources */,
 				292FFA862BF5A11F008494AB /* WeatherDetailTableViewCell.swift in Sources */,
+				2951A1962C0D730D00F11A40 /* FlightDetailTableViewCell.swift in Sources */,
 				29FADCEF2BE2133D00C28F63 /* UIViewController+displayMessage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

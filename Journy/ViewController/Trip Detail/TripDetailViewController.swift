@@ -11,14 +11,21 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     
     @IBOutlet weak var tripDetailTableView: UITableView!
     
+    weak var databaseController: DatabaseProtocol?
+    
     var currentTrip: Trip?
     var weatherData: Weather?
+    
+    var flights: [FlightInfo] = []
     
     private let weatherApiKey = "DuSdxqGXZmuph7QPgI6TtnzcrD0zSfdg"
     private let flightApiKey = "12b6c2749bb9802c6b99bfb387427a80"
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        databaseController = appDelegate?.databaseController
         
         tripDetailTableView.delegate = self
         tripDetailTableView.dataSource = self
@@ -27,14 +34,24 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         if let location = currentTrip?.location {
             fetchWeatherData(for: location)
         }
+        
+        
+        fetchFlightData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return 1
         }
+        else if section == 1 {
+            return flights.count
+        }
         
         return 0
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -65,11 +82,21 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             
             return cell
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "flightCell", for: indexPath)
+        else if indexPath.section == 1 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "flightCell", for: indexPath) as! FlightDetailTableViewCell
+            
+            if flights.count != 0 {
+                let flight = flights[indexPath.row]
+                print(flight)
+                
+                cell.arrivalAirportLabel.text = flight.arrivalAirport
+            }
+            
+            
+            return cell
+        }
         
-        
-        
-        return cell
+        return UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -163,51 +190,79 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         weatherTask.resume()
     }
     
-//    func fetchFlightInfo(flightNumber: String, departureDate: String) {
-//        let url = "https://api.aviationstack.com/v1/flights?access_key=\(flightApiKey)&flight_number=\(flightNumber)&flight_date=\(departureDate)"
-//
-//        let task = URLSession.shared.dataTask(with: URL(string: url)!) { (data, response, error) in
-//            if let error = error {
-//                print("Error fetching flight info: \(error.localizedDescription)")
-//                return
-//            }
-//
-//            guard let data = data else {
-//                print("No data received from flight info API")
-//                return
-//            }
-//
-//            do {
-//                if let jsonResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-//                   let flightData = jsonResult["data"] as? [[String: Any]],
-//                   let flight = flightData.first {
-//                    let airline = flight["airline"]["name"] as? String ?? ""
-//                    let flightNumber = flight["flight"]["number"] as? String ?? ""
-//                    let departureAirport = flight["departure"]["airport"] as? String ?? ""
-//                    let arrivalAirport = flight["arrival"]["airport"] as? String ?? ""
-//                    let departureTimeStr = flight["departure"]["scheduled"] as? String ?? ""
-//                    let arrivalTimeStr = flight["arrival"]["scheduled"] as? String ?? ""
-//                    let boardingGate = flight["departure"]["gate"] as? String ?? ""
-//
-//                    let dateFormatter = DateFormatter()
-//                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-//
-//                    if let departureDate = dateFormatter.date(from: departureTimeStr),
-//                       let arrivalDate = dateFormatter.date(from: arrivalTimeStr) {
-//                        let flightInfo = FlightInfo(id: UUID().uuidString, airline: airline, flightNumber: flightNumber, departureAirport: departureAirport, arrivalAirport: arrivalAirport, departureDate: departureDate, arrivalDate: arrivalDate, departureTime: departureTimeStr, arrivalTime: arrivalTimeStr, boardingGate: boardingGate)
-//                        
-//                        DispatchQueue.main.async {
-//                            // Update UI with flight info
-//                            self.updateFlightInfoUI(with: flightInfo)
-//                        }
-//                    }
-//                }
-//            } catch {
-//                print("Error parsing flight info: \(error.localizedDescription)")
-//            }
-//        }
-//        task.resume()
-//    }
+    func fetchFlightData() {
+        guard let trip = currentTrip else { return }
+        databaseController?.fetchFlightInfoForTrip(trip.id) { [weak self] result in
+            switch result {
+            case .success(let flightInfoArray):
+                print("fetching flights")
+                print(flightInfoArray)
+                
+                for flightInfo in flightInfoArray {
+                    if let flightInfo = flightInfo {
+                        self?.fetchFlightInfo(flightInfo: flightInfo)
+                    }
+                }
+            case .failure(let error):
+                print("Error fetching flight info: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func fetchFlightInfo(flightInfo: FlightInfo) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let departureDateStr = dateFormatter.string(from: flightInfo.departureDate)
+
+        let url = "https://api.aviationstack.com/v1/flights?access_key=\(flightApiKey)&flight_number=\(flightInfo.flightNumber)&flight_date=\(departureDateStr)"
+        
+        let task = URLSession.shared.dataTask(with: URL(string: url)!) { (data, response, error) in
+            if let error = error {
+                print("Error fetching flight info: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received from flight info API")
+                return
+            }
+            
+            do {
+                print("fetching flight data")
+                if let jsonResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let flightData = jsonResult["data"] as? [[String: Any]],
+                   let flight = flightData.first {
+                    let airline = flight["airline"] as? [String: Any]
+                    let departure = flight["departure"] as? [String: Any]
+                    let arrival = flight["arrival"] as? [String: Any]
+                    
+                    flightInfo.airline = airline?["name"] as? String ?? ""
+                    flightInfo.departureAirport = departure?["airport"] as? String ?? ""
+                    flightInfo.arrivalAirport = arrival?["airport"] as? String ?? ""
+                    
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                    
+                    flightInfo.departureDate = dateFormatter.date(from: departure?["scheduled"] as? String ?? "") ?? Date()
+                    flightInfo.arrivalDate = dateFormatter.date(from: arrival?["scheduled"] as? String ?? "") ?? Date()
+                    
+                    print("problem fetching data")
+                    
+                    DispatchQueue.main.async {
+                        print("successfully retrieved flights data")
+                        
+                        self.flights.append(flightInfo)
+                        self.tripDetailTableView.reloadData()
+                        print(self.flights)
+                    }
+                }
+            } catch {
+                print("Error parsing flight info: \(error.localizedDescription)")
+            }
+        }
+        task.resume()
+    }
+
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "addPlanSegue" {

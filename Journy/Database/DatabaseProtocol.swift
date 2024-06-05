@@ -25,7 +25,7 @@ protocol DatabaseProtocol: NSObject {
     func deleteExpense(_ expense: Expense, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     
     // Trip flights
-    func fetchFlightInfoForTrip(_ tripID: String, completion: @escaping (Result<FlightInfo?, Error>) -> Void)
+    func fetchFlightInfoForTrip(_ tripID: String, completion: @escaping (Result<[FlightInfo?], Error>) -> Void)
     func addFlightInfo(_ flightInfo: FlightInfo, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     func updateFlightInfo(_ flightInfo: FlightInfo, completion: @escaping (Result<Void, Error>) -> Void)
     func deleteFlightInfo(fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)

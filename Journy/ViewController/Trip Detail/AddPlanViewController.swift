@@ -16,18 +16,27 @@ class AddPlanViewController: UIViewController {
     var tripID: String?
     
     var datePickerContainer: UIView?
-    var datePicker: UIDatePicker?
     var timePickerContainer: UIView?
     var timePicker: UIDatePicker?
     
+    let datePicker = UIDatePicker()
+    let toolbar = UIToolbar()
+    
     var textFieldValues: [String: String] = [:]
     var dateFieldValues: [String: Date] = [:]
+    var activeTextField: UITextField?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         databaseController = appDelegate?.databaseController
+        
+        datePicker.preferredDatePickerStyle = .wheels
+        toolbar.sizeToFit()
+        
+        let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: #selector(doneBtnPressed))
+        toolbar.setItems([doneBtn], animated: true)
         
         setupConstraints()
         updateTextFields()
@@ -86,31 +95,26 @@ class AddPlanViewController: UIViewController {
         
         switch planSegmentedControl.selectedSegmentIndex {
         case 0: // Flight
-            let departureDateTextField = createDateTextField(placeholder: "Departure Date")
+            let departureDateTimeTextField = createDatePickerTextField(placeholder: "Departure Date & Time")
             let flightNumberTextField = createTextField(placeholder: "Flight Number")
-            inputStackView.addArrangedSubview(departureDateTextField)
+            inputStackView.addArrangedSubview(departureDateTimeTextField)
             inputStackView.addArrangedSubview(flightNumberTextField)
-            
         case 1: // Accommodation
             let nameTextField = createTextField(placeholder: "Accommodation Name")
-            let checkInDateTextField = createDateTextField(placeholder: "Check-in Date")
-            let checkOutDateTextField = createDateTextField(placeholder: "Check-out Date")
+            let checkInDateTextField = createDatePickerTextField(placeholder: "Check-in Date")
+            let checkOutDateTextField = createDatePickerTextField(placeholder: "Check-out Date")
             let locationTextField = createTextField(placeholder: "Location")
             inputStackView.addArrangedSubview(nameTextField)
             inputStackView.addArrangedSubview(checkInDateTextField)
             inputStackView.addArrangedSubview(checkOutDateTextField)
             inputStackView.addArrangedSubview(locationTextField)
-            
         case 2: // Activity
             let nameTextField = createTextField(placeholder: "Activity Name")
             let locationTextField = createTextField(placeholder: "Activity Location")
-            let dateTextField = createDateTextField(placeholder: "Activity Date")
-            let timeTextField = createTimeTextField(placeholder: "Activity Time")
+            let dateTextField = createDatePickerTextField(placeholder: "Activity Date & Time")
             inputStackView.addArrangedSubview(nameTextField)
             inputStackView.addArrangedSubview(locationTextField)
             inputStackView.addArrangedSubview(dateTextField)
-            inputStackView.addArrangedSubview(timeTextField)
-            
         default:
             break
         }
@@ -130,78 +134,52 @@ class AddPlanViewController: UIViewController {
         return textField
     }
     
-    func createDateTextField(placeholder: String) -> UITextField {
+    func createDatePickerTextField(placeholder: String) -> UITextField {
         let textField = createTextField(placeholder: placeholder)
-        textField.inputView = createDatePickerContainer()
+
+        textField.inputAccessoryView = toolbar
+        
+        // Configure date picker mode based on the placeholder
+        if placeholder.contains("Date & Time") {
+            datePicker.datePickerMode = .dateAndTime
+        } else {
+            datePicker.datePickerMode = .date
+        }
+        
+        textField.inputView = datePicker
+        textField.addTarget(self, action: #selector(textFieldDidBeginEditing(_:)), for: .editingDidBegin)
+        
         return textField
     }
     
-    func createTimeTextField(placeholder: String) -> UITextField {
-        let textField = createTextField(placeholder: placeholder)
-        textField.inputView = UIView()
-        textField.inputAccessoryView = createTimePickerContainer()
-        return textField
+    @objc func textFieldDidBeginEditing(_ textField: UITextField) {
+        activeTextField = textField
     }
     
     @objc func textFieldValueChanged(_ textField: UITextField) {
         textFieldValues[textField.placeholder ?? ""] = textField.text
     }
     
-    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        if let textField = inputStackView.arrangedSubviews.first(where: { $0.isFirstResponder }) as? UITextField {
-            textField.text = dateFormatter.string(from: sender.date)
-            dateFieldValues[textField.placeholder ?? ""] = sender.date
+    @objc func doneBtnPressed() {
+        if let activeTextField = activeTextField {
+            let dateFormatter = DateFormatter()
+            if activeTextField.placeholder?.contains("Date & Time") == true {
+                dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+            } else {
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+            }
+            
+            activeTextField.text = dateFormatter.string(from: datePicker.date)
+            dateFieldValues[activeTextField.placeholder ?? ""] = datePicker.date
         }
+        self.view.endEditing(true)
     }
-    
-    @objc func timePickerValueChanged(_ sender: UIDatePicker) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
-        
-        if let textField = inputStackView.arrangedSubviews.first(where: { $0.isFirstResponder }) as? UITextField {
-            textField.text = dateFormatter.string(from: sender.date)
-            dateFieldValues[textField.placeholder ?? ""] = sender.date
-        }
-    }
-    
-    func createDatePickerContainer() -> UIView {
-        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 216))
-        
-        let datePicker = UIDatePicker(frame: CGRect(x: 0, y: 0, width: container.frame.width, height: 216))
-        datePicker.datePickerMode = .date
-        datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
-        
-        container.addSubview(datePicker)
-        
-        datePickerContainer = container
-        self.datePicker = datePicker
-        
-        return container
-    }
-    
-    func createTimePickerContainer() -> UIView {
-        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 216))
-        
-        let timePicker = UIDatePicker(frame: CGRect(x: 0, y: 0, width: container.frame.width, height: 216))
-        timePicker.datePickerMode = .time
-        timePicker.addTarget(self, action: #selector(timePickerValueChanged(_:)), for: .valueChanged)
-        
-        container.addSubview(timePicker)
-        
-        timePickerContainer = container
-        self.timePicker = timePicker
-        
-        return container
-    }
-    
+
     func saveFlightInfo(tripID: String) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
-        guard let flightNumber = textFieldValues["Flight Number"], let departureDate = dateFieldValues["Departure Date"] else {
+        guard let flightNumber = textFieldValues["Flight Number"], let departureDate = dateFieldValues["Departure Date & Time"] else {
             displayMessage(title: "Error", message: "Please fill in all the flight details.")
             return
         }

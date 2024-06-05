@@ -15,7 +15,7 @@ class Trip: NSObject {
     let endDate: Date
     let imageURL: String?
     var expenses: [Expense] = []
-    var flightInfo: FlightInfo?
+    var flightInfo: [FlightInfo?] = []
     var destinations: [Activity] = []
     var accommodations: [Accommodation] = []
     
@@ -35,7 +35,7 @@ class Trip: NSObject {
     
     // Method to set the flight information for the trip
     func setFlightInfo(_ flightInfo: FlightInfo) {
-        self.flightInfo = flightInfo
+        self.flightInfo.append(flightInfo)
     }
     
     // Method to add a destination to the trip
