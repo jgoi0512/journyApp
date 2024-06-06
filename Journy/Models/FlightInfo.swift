@@ -9,12 +9,14 @@ import Foundation
 
 class FlightInfo: NSObject {
     let id: String
-    var airline: String = ""
+    var airline: String?
     var flightNumber: String
-    var departureAirport: String = ""
-    var arrivalAirport: String = ""
+    var departureAirport: String?
+    var arrivalAirport: String?
     var departureDate: Date
-    var arrivalDate: Date = Date()
+    var arrivalDate: Date?
+    var boardingGate: String?
+    var departureTerminal: String?
 
     init(id: String, flightNumber: String, departureDate: Date) {
         self.id = id

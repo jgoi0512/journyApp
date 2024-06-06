@@ -18,6 +18,8 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     
     var flights: [FlightInfo] = []
     
+    let dateFormatter = DateFormatter()
+    
     private let weatherApiKey = "DuSdxqGXZmuph7QPgI6TtnzcrD0zSfdg"
     private let flightApiKey = "12b6c2749bb9802c6b99bfb387427a80"
     
@@ -34,7 +36,6 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         if let location = currentTrip?.location {
             fetchWeatherData(for: location)
         }
-        
         
         fetchFlightData()
     }
@@ -79,7 +80,6 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                 }
             }
             
-            
             return cell
         }
         else if indexPath.section == 1 {
@@ -87,11 +87,23 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             
             if flights.count != 0 {
                 let flight = flights[indexPath.row]
-                print(flight)
+                dateFormatter.dateFormat = "h:mm a"
                 
+                cell.flightNoLabel.text = flight.flightNumber
                 cell.arrivalAirportLabel.text = flight.arrivalAirport
+                cell.departureAirportLabel.text = flight.departureAirport
+                if let arrivalDate = flight.arrivalDate, let boardingGate = flight.boardingGate, let departureTerminal = flight.departureTerminal {
+                    cell.arrivalTimeLabel.text = dateFormatter.string(from: arrivalDate)
+                    cell.boardingGateLabel.text = boardingGate
+                    cell.terminalLabel.text = departureTerminal
+                }
+                else {
+                    cell.arrivalTimeLabel.text = "N/A"
+                    cell.boardingGateLabel.text = "N/A"
+                    cell.terminalLabel.text = "N/A"
+                }
+                cell.departureTimeLabel.text = dateFormatter.string(from: flight.departureDate)
             }
-            
             
             return cell
         }
@@ -103,6 +115,24 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if indexPath.section == 1 && editingStyle == .delete {
+            let flightToDelete = flights[indexPath.row]
+            databaseController?.deleteFlightInfo(flightToDelete.id, fromTrip: currentTrip?.id ?? "") { [weak self] result in
+                switch result {
+                case .success:
+                    self?.flights.remove(at: indexPath.row)
+                    DispatchQueue.main.async {
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                case .failure(let error):
+                    print("Error deleting flight info: \(error.localizedDescription)")
+                    // Optionally, show an alert to the user
+                }
+            }
+        }
+    }
+    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
             if let trip = currentTrip {
@@ -111,7 +141,7 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                 return headerView
             }
         }
-        else if section == 1 {
+        else if section == 1 && flights.count != 0 {
             let headerView = UITableViewHeaderFooterView()
             headerView.textLabel?.text = "Your Flights"
             return headerView
@@ -210,15 +240,13 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     func fetchFlightInfo(flightInfo: FlightInfo) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let departureDateStr = dateFormatter.string(from: flightInfo.departureDate)
-
-        let url = "https://api.aviationstack.com/v1/flights?access_key=\(flightApiKey)&flight_number=\(flightInfo.flightNumber)&flight_date=\(departureDateStr)"
+        let url = "http://api.aviationstack.com/v1/flights?access_key=\(flightApiKey)&flight_iata=\(flightInfo.flightNumber)"
         
+        print(url)
         let task = URLSession.shared.dataTask(with: URL(string: url)!) { (data, response, error) in
             if let error = error {
                 print("Error fetching flight info: \(error.localizedDescription)")
+                self.displayMessage(title: "Error", message: "There was a problem with fetching flight info.")
                 return
             }
             
@@ -228,25 +256,25 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             }
             
             do {
-                print("fetching flight data")
                 if let jsonResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                    let flightData = jsonResult["data"] as? [[String: Any]],
                    let flight = flightData.first {
+                    print("fetching flight data")
                     let airline = flight["airline"] as? [String: Any]
                     let departure = flight["departure"] as? [String: Any]
                     let arrival = flight["arrival"] as? [String: Any]
                     
                     flightInfo.airline = airline?["name"] as? String ?? ""
-                    flightInfo.departureAirport = departure?["airport"] as? String ?? ""
-                    flightInfo.arrivalAirport = arrival?["airport"] as? String ?? ""
+                    flightInfo.departureAirport = departure?["iata"] as? String ?? ""
+                    flightInfo.arrivalAirport = arrival?["iata"] as? String ?? ""
+                    flightInfo.departureTerminal = departure?["terminal"] as? String ?? ""
+                    flightInfo.boardingGate = departure?["gate"] as? String ?? ""
                     
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-                    
+                                        
                     flightInfo.departureDate = dateFormatter.date(from: departure?["scheduled"] as? String ?? "") ?? Date()
                     flightInfo.arrivalDate = dateFormatter.date(from: arrival?["scheduled"] as? String ?? "") ?? Date()
-                    
-                    print("problem fetching data")
                     
                     DispatchQueue.main.async {
                         print("successfully retrieved flights data")
@@ -258,6 +286,7 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                 }
             } catch {
                 print("Error parsing flight info: \(error.localizedDescription)")
+                self.displayMessage(title: "Error", message: "There was a problem with parsing flight info.")
             }
         }
         task.resume()

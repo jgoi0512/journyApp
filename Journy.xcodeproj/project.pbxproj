@@ -15,6 +15,7 @@
 		29434C422BED8AD000CCE431 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29434C412BED8AD000CCE431 /* ProfileViewController.swift */; };
 		29434C452BF3933700CCE431 /* TripDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29434C442BF3933700CCE431 /* TripDetailViewController.swift */; };
 		2951A1962C0D730D00F11A40 /* FlightDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */; };
+		2951A19A2C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2951A1992C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift */; };
 		297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */; };
 		29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F947F32BE3278500F1CF23 /* FirebaseStorage */; };
 		29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F947F52BE3525700F1CF23 /* AddTripViewController.swift */; };
@@ -50,6 +51,7 @@
 		29434C412BED8AD000CCE431 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		29434C442BF3933700CCE431 /* TripDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailViewController.swift; sourceTree = "<group>"; };
 		2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailTableViewCell.swift; sourceTree = "<group>"; };
+		2951A1992C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccommodationDetailTableViewCell.swift; sourceTree = "<group>"; };
 		297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailTableViewCell.swift; sourceTree = "<group>"; };
 		29F947F52BE3525700F1CF23 /* AddTripViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripViewController.swift; sourceTree = "<group>"; };
 		29FADCBA2BD7363800C28F63 /* Journy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Journy.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +106,7 @@
 				292FFA812BF4310F008494AB /* AddPlanViewController.swift */,
 				292FFA852BF5A11F008494AB /* WeatherDetailTableViewCell.swift */,
 				2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */,
+				2951A1992C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift */,
 			);
 			path = "Trip Detail";
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 				29FADCE22BE1F25B00C28F63 /* Trip.swift in Sources */,
 				29FADCDD2BE1F11700C28F63 /* FirebaseController.swift in Sources */,
 				29FADCD22BD7373000C28F63 /* LoginViewController.swift in Sources */,
+				2951A19A2C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift in Sources */,
 				29FADCBE2BD7363800C28F63 /* AppDelegate.swift in Sources */,
 				29FADCC02BD7363800C28F63 /* SceneDelegate.swift in Sources */,
 				29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */,
@@ -472,6 +476,8 @@
 				DEVELOPMENT_TEAM = 4RU29WWD8Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Journy/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This application requires the camera to take photos for storage in the\napplication";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This application requires the use of the photo library to get photos on the\nsimulator";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -500,6 +506,8 @@
 				DEVELOPMENT_TEAM = 4RU29WWD8Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Journy/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This application requires the camera to take photos for storage in the\napplication";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This application requires the use of the photo library to get photos on the\nsimulator";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

@@ -81,7 +81,7 @@ class AddPlanViewController: UIViewController {
             saveFlightInfo(tripID: tripID)
         case 1: // Accommodation
             print("temp")
-//            saveAccommodation(tripID: tripID)
+            saveAccommodationInfo(tripID: tripID)
         case 2: // Activity
             print("temp")
 //            saveActivity(tripID: tripID)
@@ -177,9 +177,10 @@ class AddPlanViewController: UIViewController {
 
     func saveFlightInfo(tripID: String) {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
         
-        guard let flightNumber = textFieldValues["Flight Number"], let departureDate = dateFieldValues["Departure Date & Time"] else {
+        guard let flightNumber = textFieldValues["Flight Number"], 
+              let departureDate = dateFieldValues["Departure Date & Time"] else {
             displayMessage(title: "Error", message: "Please fill in all the flight details.")
             return
         }
@@ -189,11 +190,34 @@ class AddPlanViewController: UIViewController {
         databaseController?.addFlightInfo(flightInfo, toTrip: tripID) { [weak self] result in
             switch result {
             case .success:
-                self?.displayMessage(title: "Success", message: "Flight information saved successfully.")
                 self?.navigationController?.popViewController(animated: true)
+                self?.displayMessage(title: "Success", message: "Flight information saved successfully.")
             case .failure(let error):
                 self?.displayMessage(title: "Error", message: "Failed to save flight information: \(error.localizedDescription)")
             }
         }
     }
+    
+    func saveAccommodationInfo(tripID: String) {
+        guard let name = textFieldValues["Accommodation Name"],
+              let location = textFieldValues["Location"],
+              let checkInDate = dateFieldValues["Check-in Date"],
+              let checkOutDate = dateFieldValues["Check-out Date"] else {
+            displayMessage(title: "Error", message: "Please fill in all the accommodation details.")
+            return
+        }
+
+        let accommodation = Accommodation(id: UUID().uuidString, name: name, location: location, checkInDate: checkInDate, checkOutDate: checkOutDate)
+
+        databaseController?.addAccommodationToTrip(accommodation, tripID: tripID) { [weak self] result in
+            switch result {
+            case .success:
+                self?.navigationController?.popViewController(animated: true)
+                self?.displayMessage(title: "Success", message: "Accommodation information saved successfully.")
+            case .failure(let error):
+                self?.displayMessage(title: "Error", message: "Failed to save accommodation information: \(error.localizedDescription)")
+            }
+        }
+    }
+
 }
