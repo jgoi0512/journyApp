@@ -9,6 +9,12 @@ import Foundation
 import UIKit
 import MapKit
 
+/**
+ A custom view for displaying location search results.
+ 
+ This view provides a table view to display location search results fetched from the MKLocalSearchCompleter.
+ Users can select a location from the search results, triggering a callback with the selected search completion object.
+ */
 class LocationSearchView: UIView, UITableViewDelegate, UITableViewDataSource {
     var searchResults: [MKLocalSearchCompletion] = []
     var onSelectLocation: ((MKLocalSearchCompletion) -> Void)?
@@ -35,6 +41,7 @@ class LocationSearchView: UIView, UITableViewDelegate, UITableViewDataSource {
         tableView.dataSource = self
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: topAnchor),
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -49,8 +56,10 @@ class LocationSearchView: UIView, UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "LocationCell", for: indexPath)
+        
         let searchResult = searchResults[indexPath.row]
         cell.textLabel?.text = searchResult.title
+        
         return cell
     }
     
@@ -61,6 +70,5 @@ class LocationSearchView: UIView, UITableViewDelegate, UITableViewDataSource {
     
     func reloadData() {
         tableView.reloadData()
-        print("Reloading table view with \(searchResults.count) results")
     }
 }

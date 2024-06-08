@@ -27,14 +27,4 @@ class Trip: NSObject {
         self.endDate = endDate
         self.imageURL = imageURL
     }
-    
-    // Method to add an expense to the trip
-    func addExpense(_ expense: Expense) {
-        expenses.append(expense)
-    }
-    
-    // Method to add a destination to the trip
-    func addDestination(_ destination: Activity) {
-        destinations.append(destination)
-    }
 }

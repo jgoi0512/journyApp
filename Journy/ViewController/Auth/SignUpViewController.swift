@@ -30,18 +30,29 @@ class SignUpViewController: UIViewController, PHPickerViewControllerDelegate {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         databaseController = appDelegate?.databaseController
         
-        // Setting up image view to be circular and adding a black border around the image view.
+        view.addSubview(loadingIndicator)
+        loadingIndicator.center = view.center
+                
+        requestPhotoLibraryAccess()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
         profilePictureImageView.layer.masksToBounds = true
         profilePictureImageView.layer.cornerRadius = profilePictureImageView.frame.height / 2
         profilePictureImageView.layer.borderColor = UIColor.black.cgColor
         profilePictureImageView.layer.borderWidth = 1.5
-        
-        view.addSubview(loadingIndicator)
-        loadingIndicator.center = view.center
-        
-        requestPhotoLibraryAccess()
     }
     
+    // MARK: Actions
+    
+    /**
+      Called when the upload image button is tapped.
+      Presents a photo picker for the user to select an image.
+     
+      - Parameter sender: The source of the action.
+     */
     @IBAction func uploadImageButtonTapped(_ sender: Any) {
         var config = PHPickerConfiguration()
         config.filter = .images
@@ -52,6 +63,15 @@ class SignUpViewController: UIViewController, PHPickerViewControllerDelegate {
         present(picker, animated: true, completion: nil)
     }
     
+    // MARK: PHPickerViewController Methods
+    
+    /**
+      Handles the result of the photo picker after the user selects an image.
+     
+      - Parameters:
+        - picker: The PHPickerViewController instance that presents the photo picker.
+        - results: An array of PHPickerResult objects representing the selected images.
+     */
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true, completion: nil)
         
@@ -70,6 +90,10 @@ class SignUpViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+      Requests access to the user's photo library.
+      Displays an appropriate message if access is denied.
+     */
     func requestPhotoLibraryAccess() {
         PHPhotoLibrary.requestAuthorization { status in
             switch status {
@@ -87,48 +111,61 @@ class SignUpViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+      Called when the sign-up button is tapped.
+      Validates user input and initiates the sign-up process.
+     
+      - Parameter sender: The source of the action.
+     */
     @IBAction func signUpButtonTapped(_ sender: Any) {
         guard let name = nameTextField.text, !name.isEmpty, let email = emailTextField.text, !email.isEmpty, let password = passwordTextField.text, !password.isEmpty else {
-                displayMessage(title: "Error", message: "Please fill in all the fields.")
+            displayMessage(title: "Error", message: "Please fill in all the fields.")
             
-                return
-            }
-        
-        self.view.isUserInteractionEnabled = false
-        loadingIndicator.startAnimating()
-        
-        databaseController?.signUp(email: email, password: password) { [weak self] result in
-            switch result {
-            case .success(let user):
-                user.displayName = name
+            return
+        }
                 
-                if let profileImage = self?.profilePictureImageView.image {
-                    self?.uploadProfileImage(profileImage, for: user) { result in
-                        print("uploading image")
-                        self?.view.isUserInteractionEnabled = true
-                        self?.loadingIndicator.stopAnimating()
-                        switch result {
-                        case .success(let imageURL):
-                            print("successfully uploaded image to firebase storage.")
-                            user.profileImageURL = imageURL
-                            self?.updateUserProfile(user)
-                        case .failure(let error):
-                            print("Error uploading profile image: \(error.localizedDescription)")
-                            self?.updateUserProfile(user)
+        self.view.isUserInteractionEnabled = false
+        
+        DispatchQueue.main.async {
+            self.loadingIndicator.startAnimating()
+        }
+        
+        databaseController?.signUp(email: email, password: password) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    user.displayName = name
+                    
+                    if let profileImage = self.profilePictureImageView.image {
+                        self.uploadProfileImage(profileImage, for: user) { result in
+                            print("uploading image")
+                            self.view.isUserInteractionEnabled = true
+                            switch result {
+                            case .success(let imageURL):
+                                print("successfully uploaded image to firebase storage.")
+                                user.profileImageURL = imageURL
+                                self.updateUserProfile(user)
+                            case .failure(let error):
+                                print("Error uploading profile image: \(error.localizedDescription)")
+                                self.updateUserProfile(user)
+                            }
                         }
                     }
-                } else {
-                    self?.updateUserProfile(user)
+                case .failure(let error):
+                    self.view.isUserInteractionEnabled = true
+                    
+                    self.displayMessage(title: "Sign Up Failure", message: error.localizedDescription)
                 }
-            case .failure(let error):
-                self?.view.isUserInteractionEnabled = true
-                self?.loadingIndicator.stopAnimating()
-                
-                self?.displayMessage(title: "Sign Up Failure", message: error.localizedDescription)
+                self.loadingIndicator.stopAnimating()
             }
         }
     }
     
+    /**
+      Updates the user's profile information with the provided data.
+     
+      - Parameter user: The AuthUser object containing the user's profile details.
+     */
     private func updateUserProfile(_ user: AuthUser) {
         databaseController?.updateUserProfile(user) { [weak self] result in
             switch result {
@@ -141,6 +178,14 @@ class SignUpViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+      Uploads the given profile image to Firebase Storage and returns the image URL.
+     
+      - Parameters:
+        - image: The UIImage object representing the profile picture.
+        - user: The AuthUser object representing the user.
+        - completion: A closure that takes a Result object containing either the image URL or an error.
+     */
     private func uploadProfileImage(_ image: UIImage, for user: AuthUser, completion: @escaping (Result<URL, Error>) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to JPEG data"])))
@@ -166,6 +211,9 @@ class SignUpViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+      Navigates the user to the home screen after a successful sign-up.
+     */
     private func navigateToHomeScreen() {
         print("Navigating to home screen.")
         let homeVC = storyboard?.instantiateViewController(withIdentifier: "homeTabBarController") as! HomeTabBarViewController

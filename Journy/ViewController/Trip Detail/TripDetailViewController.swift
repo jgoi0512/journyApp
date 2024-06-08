@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TripDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddPlanDelegate {
+class TripDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var tripDetailTableView: UITableView!
     
     weak var databaseController: DatabaseProtocol?
@@ -20,6 +20,7 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     var activities: [Activity] = []
     
     let dateFormatter = DateFormatter()
+    private let refreshControl = UIRefreshControl()
     
     private let weatherApiKey = "DuSdxqGXZmuph7QPgI6TtnzcrD0zSfdg"
     private let flightApiKey = "12b6c2749bb9802c6b99bfb387427a80"
@@ -32,6 +33,9 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         
         tripDetailTableView.delegate = self
         tripDetailTableView.dataSource = self
+        
+        tripDetailTableView.refreshControl = refreshControl
+        refreshControl.addTarget(self, action: #selector(refreshData(_:)), for: .valueChanged)
                 
         // Do any additional setup after loading the view.
         if let location = currentTrip?.location {
@@ -47,6 +51,8 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         // Fetch activities from Firebase
         fetchActivities()
     }
+    
+    // MARK: Table View Methods
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
@@ -111,11 +117,6 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                     cell.boardingGateLabel.text = boardingGate
                     cell.terminalLabel.text = departureTerminal
                 }
-                else {
-                    cell.arrivalTimeLabel.text = "N/A"
-                    cell.boardingGateLabel.text = "N/A"
-                    cell.terminalLabel.text = "N/A"
-                }
                 cell.departureTimeLabel.text = dateFormatter.string(from: flight.departureDate)
             }
             
@@ -146,7 +147,7 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             
             if activities.count != 0 {
                 let activity = activities[indexPath.row]
-                dateFormatter.dateFormat = "yyyy-MM-dd h:mm a"
+                dateFormatter.dateFormat = "MMM d, h:mm a"
                 
                 if let activityName = activity.name,
                    let activityLocation = activity.location,
@@ -267,11 +268,24 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         return UITableView.automaticDimension
     }
     
-    func didAddPlan() -> Void {
-        print("delegate called")
+    // MARK: Actions
+    
+    @objc private func refreshData(_ sender: Any) {
+        // Fetch flight data from Firebase
+        flights = []
         fetchFlightData()
+
+        // Fetch accommodations from Firebase
         fetchAccommodations()
+
+        // Fetch activities from Firebase
+        fetchActivities()
+
+        // End refreshing
+        refreshControl.endRefreshing()
     }
+    
+    // MARK: Network Requests
     
     // Fetching location key with AccuWeather API, location key is then passed onto fetchWeatherDataWithLocationKey to fetch weather conditions.
     func fetchWeatherData(for location: String) {
@@ -352,7 +366,6 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             switch result {
             case .success(let flightInfoArray):
                 print("fetching flights")
-                print(flightInfoArray)
                                 
                 for flightInfo in flightInfoArray {
                     if let flightInfo = flightInfo {
@@ -366,9 +379,8 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     func fetchFlightInfo(flightInfo: FlightInfo) -> Void {
-        let url = "http://api.aviationstack.com/v1/flights?access_key=\(flightApiKey)&flight_iata=\(flightInfo.flightNumber)"
+        let url = "http://api.aviationstack.com/v1/flights?access_key=\(flightApiKey)&flight_itao=\(flightInfo.flightNumber)"
         
-        print(url)
         let task = URLSession.shared.dataTask(with: URL(string: url)!) { (data, response, error) in
             if let error = error {
                 print("Error fetching flight info: \(error.localizedDescription)")
@@ -407,7 +419,6 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                         
                         self.flights.append(flightInfo)
                         self.tripDetailTableView.reloadData()
-                        print(self.flights)
                     }
                 }
             } catch {
@@ -424,7 +435,6 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         databaseController?.fetchAccommodationsForTrip(trip.id) { [weak self] result in
             switch result {
             case .success(let accommodationsArray):
-                print("fetching accommodations")
                 DispatchQueue.main.async {
                     self?.accommodations = accommodationsArray
                     self?.tripDetailTableView.reloadData()
@@ -441,7 +451,6 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         databaseController?.fetchActivitiesForTrip(trip.id) { [weak self] result in
             switch result {
             case .success(let activitiesArray):
-                print("fetching activities")
                 DispatchQueue.main.async {
                     self?.activities = activitiesArray
                     self?.tripDetailTableView.reloadData()
@@ -452,6 +461,8 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
     
+    // MARK: Segue Navigation
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "addPlanSegue" {
             let destinationVC = segue.destination as! AddPlanViewController
@@ -459,10 +470,14 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         }
         else if segue.identifier == "showExpensesSegue" {
             let destinationVC = segue.destination as! ExpensesViewController
-            destinationVC.tripID = currentTrip?.id
+            destinationVC.currentTrip = currentTrip
         }
         else if segue.identifier == "showMapSegue" {
             let destinationVC = segue.destination as! TripOverviewViewController
+            destinationVC.tripID = currentTrip?.id
+        }
+        else if segue.identifier == "showFileSegue" {
+            let destinationVC = segue.destination as! FileUploadViewController
             destinationVC.tripID = currentTrip?.id
         }
     }

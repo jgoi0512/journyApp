@@ -32,6 +32,17 @@ class LoginViewController: UIViewController {
         loadingIndicator.center = view.center
     }
     
+    // MARK: Action
+    
+    /**
+     Attempts to authenticate the user using the provided email and password.
+     
+     This method validates the email and password fields. If both fields are non-empty,
+     it attempts to sign in the user using the provided credentials.
+     Upon completion, it displays an error message if authentication fails.
+     - Parameters:
+        - sender: The button triggering the login attempt.
+     */
     @IBAction func loginButtonTapped(_ sender: Any) {
         guard let email = emailTextField.text, !email.isEmpty, let password = passwordTextField.text, !password.isEmpty else {
             displayMessage(title: "Error", message: "Please enter your email and password.")

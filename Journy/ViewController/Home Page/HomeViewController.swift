@@ -31,6 +31,7 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
             switch result {
             case .success(let trips):
                 self?.trips = trips
+                
                 DispatchQueue.main.async {
                     self?.tripTableView.reloadData()
                 }
@@ -42,9 +43,6 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)        
-    }
-    
-    @IBAction func addTripButtonPressed(_ sender: Any) {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -78,6 +76,15 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+    /**
+     Downloads the image from the specified URL.
+     
+     This method asynchronously downloads the image from the provided URL.
+     It then crops the image to a specific aspect ratio before returning it.
+     - Parameters:
+        - url: The URL of the image to download.
+        - completion: A closure to be called when the download is complete, containing the downloaded image.
+     */
     func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else {
@@ -94,6 +101,16 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }.resume()
     }
     
+    /**
+     Crops the specified image to the given aspect ratio.
+     
+     This method crops the specified image to the provided aspect ratio.
+     It preserves the central region of the image.
+     - Parameters:
+        - image: The image to be cropped.
+        - aspectRatio: The aspect ratio to which the image should be cropped.
+     - Returns: The cropped image, preserving the central region.
+     */
     func cropToAspectRatio(image: UIImage, aspectRatio: CGFloat) -> UIImage? {
         let imageWidth = image.size.width
         let imageHeight = image.size.height
@@ -122,6 +139,17 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
+    /**
+     Specifies the context menu configuration for a table view cell.
+     
+     This method constructs and returns a context menu configuration for a trip table view cell.
+     It provides a delete action for removing the selected trip.
+     - Parameters:
+        - interaction: The context menu interaction that triggered this method.
+        - location: The location of the context menu.
+     - Returns: A UIContextMenuConfiguration object representing the context menu configuration.
+     */
+
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
         guard let cell = interaction.view as? TripDetailTableViewCell,
               let indexPath = tripTableView.indexPath(for: cell) else {
@@ -139,6 +167,14 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
+    /**
+     Deletes the specified trip from the database and updates the UI.
+     
+     This method deletes the specified trip from the database.
+     It also removes the trip from the local array and updates the table view accordingly.
+     - Parameters:
+        - trip: The trip to be deleted.
+     */
     func deleteTrip(_ trip: Trip) {
         databaseController?.deleteTrip(trip) { [weak self] result in
             switch result {

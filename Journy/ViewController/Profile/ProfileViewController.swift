@@ -36,6 +36,13 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         requestPhotoLibraryAccess()
     }
     
+    // MARK: Actions
+    
+    /**
+     Action triggered when the sign out button is tapped.
+     
+     This method signs out the current user and navigates to the login view controller.
+     */
     @IBAction func signOutButtonTapped(_ sender: Any) {
         databaseController?.signOut() { _ in
             print("User logged out.")
@@ -45,6 +52,11 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+     Action triggered when the upload image button is tapped.
+     
+     This method presents the PHPickerViewController for selecting an image from the photo library.
+     */
     @IBAction func uploadImageButtonTapped(_ sender: Any) {
         var config = PHPickerConfiguration()
         config.filter = .images
@@ -55,6 +67,17 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         present(picker, animated: true, completion: nil)
     }
     
+    // MARK: PHPickerViewController Method
+    
+    /**
+     Handles image selection from the PHPickerViewController.
+     
+     This method is called when the user selects an image from the PHPickerViewController.
+     It retrieves the selected image, updates the profile image view, and dismisses the picker.
+     - Parameters:
+        - picker: The PHPickerViewController instance.
+        - results: An array of PHPickerResult objects containing the selected media items.
+     */
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true, completion: nil)
         
@@ -73,6 +96,14 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    // MARK: Helper Methods
+    
+    /**
+     Requests access to the photo library.
+     
+     This method requests authorization to access the user's photo library.
+     If access is denied or restricted, it displays a message informing the user about the requirement.
+     */
     func requestPhotoLibraryAccess() {
         PHPhotoLibrary.requestAuthorization { status in
             switch status {
@@ -90,6 +121,11 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+     Action triggered when the edit button is tapped.
+     
+     This method configures the navigation bar buttons and enables editing of text fields and image selection.
+     */
     @IBAction func editButtonTapped(_ sender: Any) {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTapped))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelButtonTapped))
@@ -102,6 +138,11 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         uploadImageButton.isEnabled = true
     }
     
+    /**
+     Action triggered when the done button is tapped.
+     
+     This method finalizes the editing process by disabling text field editing, updating the user profile, and resetting the navigation bar.
+     */
     @objc func doneButtonTapped() {
         nameTextField.isUserInteractionEnabled = false
         nameTextField.isEnabled = false
@@ -136,6 +177,11 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         resetNavBar()
     }
     
+    /**
+     Action triggered when the cancel button is tapped.
+     
+     This method cancels the editing process by disabling text field editing, resetting the user data, and resetting the navigation bar.
+     */
     @objc func cancelButtonTapped() {
         nameTextField.isUserInteractionEnabled = false
         nameTextField.isEnabled = false
@@ -149,6 +195,12 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         resetNavBar()
     }
     
+    /**
+     Loads the user's profile data.
+     
+     This method fetches the current user's profile data from the database and populates the view with the retrieved information.
+     It sets the user's display name, email, and profile picture.
+     */
     func loadUserData() {
         databaseController?.fetchUserProfile { [weak self] result in
             switch result {
@@ -174,6 +226,13 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+     Updates the user's profile information.
+     
+     This method updates the user's profile information in the database with the modified display name and/or profile picture.
+     Upon successful update, it reloads the user's data and displays a success message.
+     - Parameter user: The user object containing the updated profile information.
+     */
     func updateUserProfile(user: AuthUser) {
         databaseController?.updateUserProfile(user) { result in
             switch result {
@@ -187,6 +246,14 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         }
     }
     
+    /**
+     Downloads an image from the specified URL.
+     
+     This method asynchronously downloads an image from the given URL using a URLSession data task.
+     - Parameters:
+        - url: The URL of the image to be downloaded.
+        - completion: A closure that is called when the download completes, passing the downloaded image as an argument.
+     */
     func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else {
@@ -199,11 +266,26 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
         }.resume()
     }
     
+    /**
+     Resets the navigation bar buttons.
+     
+     This method configures the navigation bar buttons to their default state, including the edit and sign out buttons.
+     */
     func resetNavBar() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Sign Out", style: .plain, target: self, action: #selector(signOutButtonTapped(_ :)))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editButtonTapped))
     }
     
+    /**
+     Uploads the user's profile image to Firebase Storage.
+     
+     This private method compresses the provided image to JPEG data and uploads it to Firebase Storage.
+     Upon successful upload, it retrieves the download URL of the image and passes it to the completion handler.
+     - Parameters:
+        - image: The profile image to be uploaded.
+        - user: The user object for whom the profile image is being uploaded.
+        - completion: A closure that is called upon completion of the upload operation, passing the result containing the download URL or an error.
+     */
     private func uploadProfileImage(_ image: UIImage, for user: AuthUser, completion: @escaping (Result<URL, Error>) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to JPEG data"])))
@@ -228,6 +310,7 @@ class ProfileViewController: UIViewController, PHPickerViewControllerDelegate {
             }
         }
     }
+    
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let selectedImage = info[.originalImage] as? UIImage {

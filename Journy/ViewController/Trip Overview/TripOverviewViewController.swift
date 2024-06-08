@@ -13,6 +13,8 @@ import GoogleMaps
 class TripOverviewViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var tripOverviewMapView: MKMapView!
+    
+    // Initializing Google Maps Geocoder
     static let geocoder = GMSGeocoder()
     var databaseController: DatabaseProtocol?
     
@@ -33,13 +35,19 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
         databaseController = appDelegate?.databaseController
 
         tripOverviewMapView.delegate = self
-        // Do any additional setup after loading the view.
+        
         guard let tripID = tripID else { return }
         
+        // Fetch accommodations and activities
         fetchAccommodationsAndActivities(for: tripID)
     }
     
-    // Function to fetch both accommodations and activities
+    // MARK: Helper Methods
+    
+    /** 
+     Fetches accommodations and activities for the specified trip.
+     - Parameter tripID: The identifier of the trip.
+     */
     func fetchAccommodationsAndActivities(for tripID: String) {
         databaseController?.fetchAccommodationsForTrip(tripID) { [weak self] result in
             switch result {
@@ -60,7 +68,10 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    // Process accommodations and add annotations
+    /** 
+     Processes the fetched accommodations and adds annotations to the map.
+     - Parameter accommodations: An array of accommodations.
+     */
     func processAccommodations(_ accommodations: [Accommodation]) {
         for accommodation in accommodations {
             geocodeAddressString(accommodation.location ?? "") { [weak self] coordinate in
@@ -69,9 +80,11 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
                 self?.accommodationCoordinates.append(coordinate)
                 
                 let annotation = MKPointAnnotation()
+                
                 annotation.coordinate = coordinate
                 annotation.title = accommodation.name
                 annotation.subtitle = "Accommodation"
+                
                 self?.tripOverviewMapView.addAnnotation(annotation)
                 
                 // Increment the count and check if all accommodations and activities are added
@@ -81,7 +94,10 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    // Process activities and add annotations
+    /** 
+     Processes the fetched activities and adds annotations to the map.
+     - Parameter activities: An array of activities.
+     */
     func processActivities(_ activities: [Activity]) {
         for activity in activities {
             geocodeAddressString(activity.location ?? "") { [weak self] coordinate in
@@ -90,9 +106,11 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
                 self?.activityCoordinates.append(coordinate)
                 
                 let annotation = MKPointAnnotation()
+                
                 annotation.coordinate = coordinate
                 annotation.title = activity.name
                 annotation.subtitle = "Activity"
+                
                 self?.tripOverviewMapView.addAnnotation(annotation)
                 
                 // Increment the count and check if all accommodations and activities are added
@@ -102,15 +120,21 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    // Geocode an address to get coordinates using Google Geocoding API
+    // MARK: Geocoding Methods
+    
+    /**
+     Geocodes an address string to obtain coordinates using Google Geocoding API.
+     - Parameters:
+       - addressString: The address to be geocoded.
+       - completion: Completion handler that returns the coordinates or nil.
+     */
     func geocodeAddressString(_ addressString: String, completion: @escaping (CLLocationCoordinate2D?) -> Void) {
         let geocodingUrl = "https://maps.googleapis.com/maps/api/geocode/json?key=\(mapsApiKey)&address=\(addressString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
         
-        print(addressString)
-        print(geocodingUrl)
         guard let url = URL(string: geocodingUrl) else {
             print("Invalid URL.")
             completion(nil)
+            
             return
         }
         
@@ -118,12 +142,14 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
             if let error = error {
                 print("Geocoding request error: \(error.localizedDescription)")
                 completion(nil)
+                
                 return
             }
             
             guard let data = data else {
                 print("No data returned from geocoding request.")
                 completion(nil)
+                
                 return
             }
             
@@ -148,13 +174,21 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
         }.resume()
     }
     
-    // Check if all annotations are added and then set the map's region
+    // MARK: Annotation Handling Methods
+    
+    /**
+     Checks if all annotations have been added to the map and sets the map's region to fit all coordinates.
+      - Parameters:
+        - totalAccommodations: Total number of accommodations.
+        - totalActivities: Total number of activities.
+     */
     func checkAllAnnotationsAdded(totalAccommodations: Int, totalActivities: Int) {
         if accommodationAnnotationsAdded == totalAccommodations && activityAnnotationsAdded == totalActivities {
             setMapViewRegionToFitAllCoordinates()
         }
     }
-    
+        
+    /// Sets the map view region to fit all accommodation and activity coordinates.
     func setMapViewRegionToFitAllCoordinates() {
         let allCoordinates = activityCoordinates + accommodationCoordinates
         
@@ -187,7 +221,15 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
             self.tripOverviewMapView.setRegion(region, animated: true)
         }
     }
-        
+    
+    // MARK: MapView Methods
+    
+    /** Provides a view for the specified annotation.
+     - Parameters:
+       - mapView: The map view requesting the annotation view.
+      - annotation: The annotation object to provide a view for.
+     - Returns: The view to display for the annotation.
+     */
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
             return nil
@@ -208,6 +250,12 @@ class TripOverviewViewController: UIViewController, MKMapViewDelegate {
         return annotationView
     }
     
+    /** Handles the event when the callout accessory control is tapped. Navigates to the maps app based on the location the user selected for navigation.
+     - Parameters:
+       - mapView: The map view containing the annotation view.
+       - view: The annotation view that was tapped.
+       - control: The control that was tapped.
+     */
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         guard let coordinate = view.annotation?.coordinate else { return }
         

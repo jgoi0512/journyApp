@@ -44,6 +44,8 @@ class AddPlanViewController: UIViewController {
         updateTextFields()
     }
     
+    // MARK: UI Constraint Setup
+    
     func setupConstraints() {
         inputStackView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -67,6 +69,8 @@ class AddPlanViewController: UIViewController {
         }
     }
     
+    // MARK: Actions
+    
     @IBAction func segmentedControlValueChanged(_ sender: UISegmentedControl) {
         updateTextFields()
     }
@@ -88,6 +92,8 @@ class AddPlanViewController: UIViewController {
             break
         }
     }
+    
+    // MARK: Helper Methods
     
     func updateTextFields() {
         inputStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -151,6 +157,8 @@ class AddPlanViewController: UIViewController {
         return textField
     }
     
+    // MARK: Text Field Events
+    
     @objc func textFieldDidBeginEditing(_ textField: UITextField) {
         activeTextField = textField
     }
@@ -158,6 +166,8 @@ class AddPlanViewController: UIViewController {
     @objc func textFieldValueChanged(_ textField: UITextField) {
         textFieldValues[textField.placeholder ?? ""] = textField.text
     }
+    
+    // MARK: Done Button Action
     
     @objc func doneBtnPressed() {
         if let activeTextField = activeTextField {
@@ -174,6 +184,8 @@ class AddPlanViewController: UIViewController {
         self.view.endEditing(true)
     }
 
+    // MARK: Save Information
+    
     func saveFlightInfo(tripID: String) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
