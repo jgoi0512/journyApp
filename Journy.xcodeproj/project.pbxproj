@@ -20,6 +20,9 @@
 		29EE83542C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EE83532C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift */; };
 		29EE83572C12EDCF0028FBA4 /* ExpensesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EE83562C12EDCE0028FBA4 /* ExpensesViewController.swift */; };
 		29EE835A2C13ED5D0028FBA4 /* FileUploadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EE83592C13ED5D0028FBA4 /* FileUploadViewController.swift */; };
+		29EE835F2C13F4DB0028FBA4 /* File.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 29EE835D2C13F4DB0028FBA4 /* File.xcdatamodeld */; };
+		29EE83622C13FB470028FBA4 /* TripOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EE83612C13FB470028FBA4 /* TripOverviewViewController.swift */; };
+		29EE83652C142D650028FBA4 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 29EE83642C142D650028FBA4 /* GoogleMaps */; };
 		29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F947F32BE3278500F1CF23 /* FirebaseStorage */; };
 		29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F947F52BE3525700F1CF23 /* AddTripViewController.swift */; };
 		29FADCBE2BD7363800C28F63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCBD2BD7363800C28F63 /* AppDelegate.swift */; };
@@ -59,6 +62,8 @@
 		29EE83532C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailTableViewCell.swift; sourceTree = "<group>"; };
 		29EE83562C12EDCE0028FBA4 /* ExpensesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpensesViewController.swift; sourceTree = "<group>"; };
 		29EE83592C13ED5D0028FBA4 /* FileUploadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUploadViewController.swift; sourceTree = "<group>"; };
+		29EE835E2C13F4DB0028FBA4 /* File.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = File.xcdatamodel; sourceTree = "<group>"; };
+		29EE83612C13FB470028FBA4 /* TripOverviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripOverviewViewController.swift; sourceTree = "<group>"; };
 		29F947F52BE3525700F1CF23 /* AddTripViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripViewController.swift; sourceTree = "<group>"; };
 		29FADCBA2BD7363800C28F63 /* Journy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Journy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		29FADCBD2BD7363800C28F63 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -89,6 +94,7 @@
 			files = (
 				29FADCD52BD7400900C28F63 /* FirebaseAuth in Frameworks */,
 				29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */,
+				29EE83652C142D650028FBA4 /* GoogleMaps in Frameworks */,
 				29FADCD72BD7400900C28F63 /* FirebaseFirestore in Frameworks */,
 				29FADCD92BD7400900C28F63 /* FirebaseFirestoreSwift in Frameworks */,
 			);
@@ -171,6 +177,14 @@
 			path = "Offline File Upload";
 			sourceTree = "<group>";
 		};
+		29EE83602C13FB370028FBA4 /* Trip Overview */ = {
+			isa = PBXGroup;
+			children = (
+				29EE83612C13FB470028FBA4 /* TripOverviewViewController.swift */,
+			);
+			path = "Trip Overview";
+			sourceTree = "<group>";
+		};
 		29FADCB12BD7363800C28F63 = {
 			isa = PBXGroup;
 			children = (
@@ -223,6 +237,7 @@
 				29FADCE92BE1F35800C28F63 /* AuthUser.swift */,
 				292FFA7F2BF42E3F008494AB /* Accommodation.swift */,
 				292FFA832BF59EC8008494AB /* Weather.swift */,
+				29EE835D2C13F4DB0028FBA4 /* File.xcdatamodeld */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -230,6 +245,7 @@
 		29FADCF02BE218C700C28F63 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				29EE83602C13FB370028FBA4 /* Trip Overview */,
 				29EE83582C13ED4B0028FBA4 /* Offline File Upload */,
 				29EE83552C12EDB70028FBA4 /* Expenses */,
 				29434C432BF3931A00CCE431 /* Trip Detail */,
@@ -262,6 +278,7 @@
 				29FADCD62BD7400900C28F63 /* FirebaseFirestore */,
 				29FADCD82BD7400900C28F63 /* FirebaseFirestoreSwift */,
 				29F947F32BE3278500F1CF23 /* FirebaseStorage */,
+				29EE83642C142D650028FBA4 /* GoogleMaps */,
 			);
 			productName = Journy;
 			productReference = 29FADCBA2BD7363800C28F63 /* Journy.app */;
@@ -293,6 +310,7 @@
 			mainGroup = 29FADCB12BD7363800C28F63;
 			packageReferences = (
 				29FADCD32BD7400900C28F63 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				29EE83632C142D650028FBA4 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
 			);
 			productRefGroup = 29FADCBB2BD7363800C28F63 /* Products */;
 			projectDirPath = "";
@@ -324,6 +342,7 @@
 			files = (
 				29FADCE22BE1F25B00C28F63 /* Trip.swift in Sources */,
 				29FADCDD2BE1F11700C28F63 /* FirebaseController.swift in Sources */,
+				29EE83622C13FB470028FBA4 /* TripOverviewViewController.swift in Sources */,
 				29FADCD22BD7373000C28F63 /* LoginViewController.swift in Sources */,
 				2951A19A2C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift in Sources */,
 				29FADCBE2BD7363800C28F63 /* AppDelegate.swift in Sources */,
@@ -342,6 +361,7 @@
 				29FADCED2BE2097200C28F63 /* HomeViewController.swift in Sources */,
 				29FADCDF2BE1F18900C28F63 /* DatabaseProtocol.swift in Sources */,
 				29FADCEA2BE1F35800C28F63 /* AuthUser.swift in Sources */,
+				29EE835F2C13F4DB0028FBA4 /* File.xcdatamodeld in Sources */,
 				29FADCE42BE1F29100C28F63 /* Activity.swift in Sources */,
 				297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */,
 				29FADCF22BE220BF00C28F63 /* SignUpViewController.swift in Sources */,
@@ -578,6 +598,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		29EE83632C142D650028FBA4 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 9.0.0;
+			};
+		};
 		29FADCD32BD7400900C28F63 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -589,6 +617,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		29EE83642C142D650028FBA4 /* GoogleMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29EE83632C142D650028FBA4 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+			productName = GoogleMaps;
+		};
 		29F947F32BE3278500F1CF23 /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 29FADCD32BD7400900C28F63 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -610,6 +643,20 @@
 			productName = FirebaseFirestoreSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		29EE835D2C13F4DB0028FBA4 /* File.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				29EE835E2C13F4DB0028FBA4 /* File.xcdatamodel */,
+			);
+			currentVersion = 29EE835E2C13F4DB0028FBA4 /* File.xcdatamodel */;
+			name = File.xcdatamodeld;
+			path = "/Users/justingoi/Documents/Personal Projects/XCode/Journy/Journy/Models/File.xcdatamodeld";
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 29FADCB22BD7363800C28F63 /* Project object */;
 }

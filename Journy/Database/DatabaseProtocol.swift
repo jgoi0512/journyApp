@@ -20,13 +20,11 @@ protocol DatabaseProtocol: NSObject {
     // Trip expenses
     func fetchExpensesForTrip(_ tripID: String, completion: @escaping (Result<[Expense], Error>) -> Void)
     func addExpense(_ expense: Expense, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
-    func updateExpense(_ expense: Expense, completion: @escaping (Result<Void, Error>) -> Void)
     func deleteExpense(_ expenseID: String, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     
     // Trip flights
     func fetchFlightInfoForTrip(_ tripID: String, completion: @escaping (Result<[FlightInfo?], Error>) -> Void)
     func addFlightInfo(_ flightInfo: FlightInfo, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
-    func updateFlightInfo(_ flightInfo: FlightInfo, completion: @escaping (Result<Void, Error>) -> Void)
     func deleteFlightInfo(_ flightInfoID: String, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     
     // Trip accommodation

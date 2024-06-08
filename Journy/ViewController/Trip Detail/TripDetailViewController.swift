@@ -461,6 +461,10 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             let destinationVC = segue.destination as! ExpensesViewController
             destinationVC.tripID = currentTrip?.id
         }
+        else if segue.identifier == "showMapSegue" {
+            let destinationVC = segue.destination as! TripOverviewViewController
+            destinationVC.tripID = currentTrip?.id
+        }
     }
 
 }

@@ -161,23 +161,6 @@ class FirebaseController: NSObject, DatabaseProtocol {
         }
     }
     
-    func updateExpense(_ expense: Expense, completion: @escaping (Result<Void, Error>) -> Void) {
-//        let expenseData: [String: Any] = [
-//            "title": expense.title,
-//            "amount": expense.amount,
-//            "date": expense.date,
-//            // to add
-//        ]
-//        
-//        db.collection("expenses").document(expense.id).setData(expenseData, merge: true) { error in
-//            if let error = error {
-//                completion(.failure(error))
-//            } else {
-//                completion(.success(()))
-//            }
-//        }
-    }
-    
     func deleteExpense(_ expenseID: String, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void) {
         tripRef?.document(tripID).getDocument { document, error in
             if let error = error {
@@ -242,46 +225,6 @@ class FirebaseController: NSObject, DatabaseProtocol {
                 completion(.failure(error))
             } else {
                 completion(.success(()))
-            }
-        }
-    }
-    
-    func updateFlightInfo(_ flightInfo: FlightInfo, completion: @escaping (Result<Void, Error>) -> Void) {
-        let flightData: [String: Any] = [
-            "airline": flightInfo.airline as Any,
-            "flightNumber": flightInfo.flightNumber,
-            "departureAirport": flightInfo.departureAirport as Any,
-            "arrivalAirport": flightInfo.arrivalAirport as Any,
-            "departureDate": flightInfo.departureDate,
-            "arrivalDate": flightInfo.arrivalDate as Any,
-            "boardingGate": flightInfo.boardingGate as Any,
-            "departureTerminal": flightInfo.departureTerminal as Any
-        ]
-        
-        // Fetch the trip document to get the current flightInfo array
-        tripRef?.document(flightInfo.id).getDocument { document, error in
-            if let error = error {
-                completion(.failure(error))
-            } else if let document = document, document.exists {
-                var flightInfoArray = document.data()?["flightInfo"] as? [[String: Any]] ?? []
-                
-                // Find the index of the flight to update
-                if let index = flightInfoArray.firstIndex(where: { $0["id"] as? String == flightInfo.id }) {
-                    flightInfoArray[index] = flightData
-                    
-                    // Update the flightInfo array in Firebase
-                    self.tripRef?.document(flightInfo.id).updateData(["flightInfo": flightInfoArray]) { error in
-                        print("updating data")
-                        if let error = error {
-                            completion(.failure(error))
-                        } else {
-                            print("successfully updated data")
-                            completion(.success(()))
-                        }
-                    }
-                } else {
-                    completion(.failure(NSError(domain: "FirebaseController", code: 0, userInfo: [NSLocalizedDescriptionKey: "Flight not found"])))
-                }
             }
         }
     }
