@@ -7,8 +7,9 @@
 
 import UIKit
 import FirebaseStorage
+import PhotosUI
 
-class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
+class SignUpViewController: UIViewController, PHPickerViewControllerDelegate {
 
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
@@ -37,23 +38,53 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate & 
         
         view.addSubview(loadingIndicator)
         loadingIndicator.center = view.center
+        
+        requestPhotoLibraryAccess()
     }
     
     @IBAction func uploadImageButtonTapped(_ sender: Any) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = .photoLibrary
-        imagePicker.allowsEditing = true
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 1
         
-        present(imagePicker, animated: true, completion: nil)
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = self
+        present(picker, animated: true, completion: nil)
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let selectedImage = info[.originalImage] as? UIImage {
-            profilePictureImageView.image = selectedImage
-        }
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
         
-        dismiss(animated: true, completion: nil)
+        guard let provider = results.first?.itemProvider else { return }
+        
+        if provider.canLoadObject(ofClass: UIImage.self) {
+            provider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+                DispatchQueue.main.async {
+                    if let selectedImage = image as? UIImage {
+                        self?.profilePictureImageView.image = selectedImage
+                    } else if let error = error {
+                        print("Error loading image: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
+    }
+    
+    func requestPhotoLibraryAccess() {
+        PHPhotoLibrary.requestAuthorization { status in
+            switch status {
+            case .authorized, .limited:
+                print("Access granted")
+            case .denied, .restricted:
+                DispatchQueue.main.async {
+                    self.displayMessage(title: "Access Denied", message: "Photo Library access is required to select a profile picture.")
+                }
+            case .notDetermined:
+                break
+            @unknown default:
+                break
+            }
+        }
     }
     
     @IBAction func signUpButtonTapped(_ sender: Any) {

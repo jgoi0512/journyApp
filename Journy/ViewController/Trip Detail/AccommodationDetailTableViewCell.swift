@@ -9,6 +9,11 @@ import UIKit
 
 class AccommodationDetailTableViewCell: UITableViewCell {
 
+    @IBOutlet weak var accommodationNameLabel: UILabel!
+    @IBOutlet weak var accommodationLocationLabel: UILabel!
+    @IBOutlet weak var checkInDateLabel: UILabel!
+    @IBOutlet weak var checkOutDateLabel: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

@@ -7,18 +7,20 @@
 
 import UIKit
 
+protocol AddPlanDelegate: AnyObject {
+    func didAddPlan() -> Void
+}
+
 class AddPlanViewController: UIViewController {
     
     @IBOutlet weak var planSegmentedControl: UISegmentedControl!
     @IBOutlet weak var inputStackView: UIStackView!
     
     weak var databaseController: DatabaseProtocol?
+    weak var delegate: AddPlanDelegate?
+    
     var tripID: String?
-    
-    var datePickerContainer: UIView?
-    var timePickerContainer: UIView?
-    var timePicker: UIDatePicker?
-    
+        
     let datePicker = UIDatePicker()
     let toolbar = UIToolbar()
     
@@ -34,7 +36,7 @@ class AddPlanViewController: UIViewController {
         
         datePicker.preferredDatePickerStyle = .wheels
         toolbar.sizeToFit()
-        
+                        
         let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: #selector(doneBtnPressed))
         toolbar.setItems([doneBtn], animated: true)
         
@@ -77,14 +79,11 @@ class AddPlanViewController: UIViewController {
         
         switch planSegmentedControl.selectedSegmentIndex {
         case 0: // Flight
-            print(textFieldValues)
             saveFlightInfo(tripID: tripID)
         case 1: // Accommodation
-            print("temp")
             saveAccommodationInfo(tripID: tripID)
         case 2: // Activity
-            print("temp")
-//            saveActivity(tripID: tripID)
+            saveActivityInfo(tripID: tripID)
         default:
             break
         }
@@ -192,6 +191,7 @@ class AddPlanViewController: UIViewController {
             case .success:
                 self?.navigationController?.popViewController(animated: true)
                 self?.displayMessage(title: "Success", message: "Flight information saved successfully.")
+                self?.delegate?.didAddPlan()
             case .failure(let error):
                 self?.displayMessage(title: "Error", message: "Failed to save flight information: \(error.localizedDescription)")
             }
@@ -214,8 +214,31 @@ class AddPlanViewController: UIViewController {
             case .success:
                 self?.navigationController?.popViewController(animated: true)
                 self?.displayMessage(title: "Success", message: "Accommodation information saved successfully.")
+                self?.delegate?.didAddPlan()
             case .failure(let error):
                 self?.displayMessage(title: "Error", message: "Failed to save accommodation information: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func saveActivityInfo(tripID: String) {
+        guard let name = textFieldValues["Activity Name"],
+              let location = textFieldValues["Activity Location"],
+              let activityDateTime = dateFieldValues["Activity Date & Time"] else {
+            displayMessage(title: "Error", message: "Please fill in all the activity details.")
+            return
+        }
+              
+        let activity = Activity(id: UUID().uuidString, name: name, location: location, activityDate: activityDateTime)
+        
+        databaseController?.addActivity(activity, toTrip: tripID) { [weak self] result in
+            switch result {
+            case .success:
+                self?.navigationController?.popViewController(animated: true)
+                self?.displayMessage(title: "Success", message: "Activity information saved successfully.")
+                self?.delegate?.didAddPlan()
+            case .failure(let error):
+                self?.displayMessage(title: "Error", message: "Failed to save activity information: \(error.localizedDescription)")
             }
         }
     }

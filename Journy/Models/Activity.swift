@@ -8,17 +8,15 @@
 import Foundation
 
 class Activity {
-    let id: String
-    let name: String
-    let location: String
-    let startDate: Date
-    let endDate: Date
+    let id: String?
+    let name: String?
+    let location: String?
+    let activityDate: Date?
     
-    init(id: String, name: String, location: String, startDate: Date, endDate: Date) {
+    init(id: String, name: String, location: String, activityDate: Date) {
         self.id = id
         self.name = name
         self.location = location
-        self.startDate = startDate
-        self.endDate = endDate
+        self.activityDate = activityDate
     }
 }

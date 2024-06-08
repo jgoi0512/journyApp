@@ -7,8 +7,7 @@
 
 import UIKit
 
-class TripDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
+class TripDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AddPlanDelegate {
     @IBOutlet weak var tripDetailTableView: UITableView!
     
     weak var databaseController: DatabaseProtocol?
@@ -17,6 +16,8 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     var weatherData: Weather?
     
     var flights: [FlightInfo] = []
+    var accommodations: [Accommodation] = []
+    var activities: [Activity] = []
     
     let dateFormatter = DateFormatter()
     
@@ -31,13 +32,20 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         
         tripDetailTableView.delegate = self
         tripDetailTableView.dataSource = self
-        
+                
         // Do any additional setup after loading the view.
         if let location = currentTrip?.location {
             fetchWeatherData(for: location)
         }
         
+        // Fetch flight data from Firebase
         fetchFlightData()
+        
+        // Fetch accommodations from Firebase
+        fetchAccommodations()
+        
+        // Fetch activities from Firebase
+        fetchActivities()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -47,12 +55,18 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         else if section == 1 {
             return flights.count
         }
+        else if section == 2 {
+            return accommodations.count
+        }
+        else if section == 3 {
+            return activities.count
+        }
         
         return 0
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 4
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -107,6 +121,44 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             
             return cell
         }
+        else if indexPath.section == 2 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "accommodationCell", for: indexPath) as! AccommodationDetailTableViewCell
+            
+            if accommodations.count != 0 {
+                let accommodation = accommodations[indexPath.row]
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                
+                if let accommodationName = accommodation.name,
+                   let accommodationLocation = accommodation.location,
+                   let accommodationCheckIn = accommodation.checkInDate,
+                   let accommodationCheckOut = accommodation.checkOutDate {
+                    cell.accommodationNameLabel.text = accommodationName
+                    cell.accommodationLocationLabel.text = accommodationLocation
+                    cell.checkInDateLabel.text = dateFormatter.string(from: accommodationCheckIn)
+                    cell.checkOutDateLabel.text = dateFormatter.string(from: accommodationCheckOut)
+                }
+            }
+            
+            return cell
+        }
+        else if indexPath.section == 3 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "activityCell", for: indexPath) as! ActivityDetailTableViewCell
+            
+            if activities.count != 0 {
+                let activity = activities[indexPath.row]
+                dateFormatter.dateFormat = "yyyy-MM-dd h:mm a"
+                
+                if let activityName = activity.name,
+                   let activityLocation = activity.location,
+                   let activityDateTime = activity.activityDate {
+                    cell.activityNameLabel.text = activityName
+                    cell.activityLocationLabel.text = activityLocation
+                    cell.activityDateLabel.text = dateFormatter.string(from: activityDateTime)
+                }
+            }
+                
+            return cell
+        }
         
         return UITableViewCell()
     }
@@ -115,40 +167,113 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        if indexPath.section == 0 {
+            return false
+        }
+        
+        return true
+    }
+    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        guard let trip = currentTrip else { return }
+        
         if indexPath.section == 1 && editingStyle == .delete {
             let flightToDelete = flights[indexPath.row]
-            databaseController?.deleteFlightInfo(flightToDelete.id, fromTrip: currentTrip?.id ?? "") { [weak self] result in
+            
+            databaseController?.deleteFlightInfo(flightToDelete.id, fromTrip: trip.id) { [weak self] result in
                 switch result {
                 case .success:
                     self?.flights.remove(at: indexPath.row)
+                    
                     DispatchQueue.main.async {
                         tableView.deleteRows(at: [indexPath], with: .automatic)
                     }
                 case .failure(let error):
                     print("Error deleting flight info: \(error.localizedDescription)")
-                    // Optionally, show an alert to the user
+                    self?.displayMessage(title: "Error", message: "Error deleting flight info. Please try again later.")
+                }
+            }
+        }
+        else if indexPath.section == 2 && editingStyle == .delete {
+            let accommodationToDelete = accommodations[indexPath.row]
+            
+            databaseController?.deleteAccommodationFromTrip(accommodationToDelete.id ?? "", tripID: trip.id) { [weak self] result in
+                switch result {
+                case .success:
+                    self?.accommodations.remove(at: indexPath.row)
+                    
+                    DispatchQueue.main.async {
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                case .failure(let error):
+                    print("Error deleting accommodation: \(error.localizedDescription)")
+                    self?.displayMessage(title: "Error", message: "Error deleting accommodation. Please try again later.")
+                }
+            }
+        }
+        else if indexPath.section == 3 && editingStyle == .delete {
+            let activityToDelete = activities[indexPath.row]
+            
+            databaseController?.deleteActivity(activityToDelete.id ?? "", fromTrip: trip.id) { [weak self] result in
+                switch result {
+                case .success:
+                    self?.activities.remove(at: indexPath.row)
+                    
+                    DispatchQueue.main.async {
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                case .failure(let error):
+                    print("Error deleting activity: \(error.localizedDescription)")
+                    self?.displayMessage(title: "Error", message: "Error deleting activity. Please try again later.")
                 }
             }
         }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UITableViewHeaderFooterView()
+
         if section == 0 {
             if let trip = currentTrip {
-                let headerView = UITableViewHeaderFooterView()
                 headerView.textLabel?.text = "Current Weather in \(trip.location)"
                 return headerView
             }
         }
         else if section == 1 && flights.count != 0 {
-            let headerView = UITableViewHeaderFooterView()
             headerView.textLabel?.text = "Your Flights"
             return headerView
         }
+        else if section == 2 && accommodations.count != 0 {
+            headerView.textLabel?.text = "Your Accommodations"
+            return headerView
+        }
+        else if section == 3 && activities.count != 0 {
+            headerView.textLabel?.text = "Your Activities"
+            return headerView
+        }
+        
         return nil
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 1 && flights.count == 0 {
+            return 0
+        }
+        else if indexPath.section == 2 && accommodations.count == 0 {
+            return 0
+        }
+        
+        return UITableView.automaticDimension
+    }
+    
+    func didAddPlan() -> Void {
+        print("delegate called")
+        fetchFlightData()
+        fetchAccommodations()
+    }
+    
+    // Fetching location key with AccuWeather API, location key is then passed onto fetchWeatherDataWithLocationKey to fetch weather conditions.
     func fetchWeatherData(for location: String) {
         let locationURL = "https://dataservice.accuweather.com/locations/v1/cities/search?apikey=\(weatherApiKey)&q=\(location)"
         
@@ -220,14 +345,15 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         weatherTask.resume()
     }
     
-    func fetchFlightData() {
+    func fetchFlightData() -> Void {
         guard let trip = currentTrip else { return }
+        
         databaseController?.fetchFlightInfoForTrip(trip.id) { [weak self] result in
             switch result {
             case .success(let flightInfoArray):
                 print("fetching flights")
                 print(flightInfoArray)
-                
+                                
                 for flightInfo in flightInfoArray {
                     if let flightInfo = flightInfo {
                         self?.fetchFlightInfo(flightInfo: flightInfo)
@@ -239,7 +365,7 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
 
-    func fetchFlightInfo(flightInfo: FlightInfo) {
+    func fetchFlightInfo(flightInfo: FlightInfo) -> Void {
         let url = "http://api.aviationstack.com/v1/flights?access_key=\(flightApiKey)&flight_iata=\(flightInfo.flightNumber)"
         
         print(url)
@@ -292,10 +418,47 @@ class TripDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         task.resume()
     }
 
+    func fetchAccommodations() -> Void {
+        guard let trip = currentTrip else { return }
+        
+        databaseController?.fetchAccommodationsForTrip(trip.id) { [weak self] result in
+            switch result {
+            case .success(let accommodationsArray):
+                print("fetching accommodations")
+                DispatchQueue.main.async {
+                    self?.accommodations = accommodationsArray
+                    self?.tripDetailTableView.reloadData()
+                }
+            case .failure(let error):
+                print("Error fetching accommodations: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func fetchActivities() -> Void {
+        guard let trip = currentTrip else { return }
+        
+        databaseController?.fetchActivitiesForTrip(trip.id) { [weak self] result in
+            switch result {
+            case .success(let activitiesArray):
+                print("fetching activities")
+                DispatchQueue.main.async {
+                    self?.activities = activitiesArray
+                    self?.tripDetailTableView.reloadData()
+                }
+            case .failure(let error):
+                print("Error fetching activities: \(error.localizedDescription)")
+            }
+        }
+    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "addPlanSegue" {
             let destinationVC = segue.destination as! AddPlanViewController
+            destinationVC.tripID = currentTrip?.id
+        }
+        else if segue.identifier == "showExpensesSegue" {
+            let destinationVC = segue.destination as! ExpensesViewController
             destinationVC.tripID = currentTrip?.id
         }
     }

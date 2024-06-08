@@ -17,6 +17,9 @@
 		2951A1962C0D730D00F11A40 /* FlightDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */; };
 		2951A19A2C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2951A1992C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift */; };
 		297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */; };
+		29EE83542C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EE83532C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift */; };
+		29EE83572C12EDCF0028FBA4 /* ExpensesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EE83562C12EDCE0028FBA4 /* ExpensesViewController.swift */; };
+		29EE835A2C13ED5D0028FBA4 /* FileUploadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EE83592C13ED5D0028FBA4 /* FileUploadViewController.swift */; };
 		29F947F42BE3278500F1CF23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F947F32BE3278500F1CF23 /* FirebaseStorage */; };
 		29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F947F52BE3525700F1CF23 /* AddTripViewController.swift */; };
 		29FADCBE2BD7363800C28F63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FADCBD2BD7363800C28F63 /* AppDelegate.swift */; };
@@ -53,6 +56,9 @@
 		2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailTableViewCell.swift; sourceTree = "<group>"; };
 		2951A1992C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccommodationDetailTableViewCell.swift; sourceTree = "<group>"; };
 		297225262BE8FA080013FC0D /* TripDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailTableViewCell.swift; sourceTree = "<group>"; };
+		29EE83532C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailTableViewCell.swift; sourceTree = "<group>"; };
+		29EE83562C12EDCE0028FBA4 /* ExpensesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpensesViewController.swift; sourceTree = "<group>"; };
+		29EE83592C13ED5D0028FBA4 /* FileUploadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUploadViewController.swift; sourceTree = "<group>"; };
 		29F947F52BE3525700F1CF23 /* AddTripViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTripViewController.swift; sourceTree = "<group>"; };
 		29FADCBA2BD7363800C28F63 /* Journy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Journy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		29FADCBD2BD7363800C28F63 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -107,6 +113,7 @@
 				292FFA852BF5A11F008494AB /* WeatherDetailTableViewCell.swift */,
 				2951A1952C0D730D00F11A40 /* FlightDetailTableViewCell.swift */,
 				2951A1992C11A16E00F11A40 /* AccommodationDetailTableViewCell.swift */,
+				29EE83532C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift */,
 			);
 			path = "Trip Detail";
 			sourceTree = "<group>";
@@ -146,6 +153,22 @@
 				29FADCC82BD7363900C28F63 /* LaunchScreen.storyboard */,
 			);
 			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		29EE83552C12EDB70028FBA4 /* Expenses */ = {
+			isa = PBXGroup;
+			children = (
+				29EE83562C12EDCE0028FBA4 /* ExpensesViewController.swift */,
+			);
+			path = Expenses;
+			sourceTree = "<group>";
+		};
+		29EE83582C13ED4B0028FBA4 /* Offline File Upload */ = {
+			isa = PBXGroup;
+			children = (
+				29EE83592C13ED5D0028FBA4 /* FileUploadViewController.swift */,
+			);
+			path = "Offline File Upload";
 			sourceTree = "<group>";
 		};
 		29FADCB12BD7363800C28F63 = {
@@ -207,6 +230,8 @@
 		29FADCF02BE218C700C28F63 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				29EE83582C13ED4B0028FBA4 /* Offline File Upload */,
+				29EE83552C12EDB70028FBA4 /* Expenses */,
 				29434C432BF3931A00CCE431 /* Trip Detail */,
 				29434C402BED8AB200CCE431 /* Profile */,
 				2960ED282BE49B36002C399C /* Add Trip */,
@@ -305,6 +330,7 @@
 				29FADCC02BD7363800C28F63 /* SceneDelegate.swift in Sources */,
 				29F947F62BE3525700F1CF23 /* AddTripViewController.swift in Sources */,
 				29434C452BF3933700CCE431 /* TripDetailViewController.swift in Sources */,
+				29EE83572C12EDCF0028FBA4 /* ExpensesViewController.swift in Sources */,
 				29FADCE62BE1F2AB00C28F63 /* FlightInfo.swift in Sources */,
 				292FFA822BF4310F008494AB /* AddPlanViewController.swift in Sources */,
 				292FFA802BF42E3F008494AB /* Accommodation.swift in Sources */,
@@ -320,6 +346,8 @@
 				297225272BE8FA080013FC0D /* TripDetailTableViewCell.swift in Sources */,
 				29FADCF22BE220BF00C28F63 /* SignUpViewController.swift in Sources */,
 				292FFA862BF5A11F008494AB /* WeatherDetailTableViewCell.swift in Sources */,
+				29EE83542C12E1CF0028FBA4 /* ActivityDetailTableViewCell.swift in Sources */,
+				29EE835A2C13ED5D0028FBA4 /* FileUploadViewController.swift in Sources */,
 				2951A1962C0D730D00F11A40 /* FlightDetailTableViewCell.swift in Sources */,
 				29FADCEF2BE2133D00C28F63 /* UIViewController+displayMessage.swift in Sources */,
 			);

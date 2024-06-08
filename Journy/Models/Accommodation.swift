@@ -8,11 +8,11 @@
 import Foundation
 
 class Accommodation {
-    let id: String
-    let name: String
-    let location: String
-    let checkInDate: Date
-    let checkOutDate: Date
+    let id: String?
+    let name: String?
+    let location: String?
+    let checkInDate: Date?
+    let checkOutDate: Date?
 
     init(id: String, name: String, location: String, checkInDate: Date, checkOutDate: Date) {
         self.id = id

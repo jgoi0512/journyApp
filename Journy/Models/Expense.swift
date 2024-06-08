@@ -8,10 +8,10 @@
 import Foundation
 
 class Expense {
-    let id: String
-    let title: String
-    let amount: Double
-    let date: Date
+    let id: String?
+    let title: String?
+    let amount: Double?
+    let date: Date?
     
     init(id: String, title: String, amount: Double, date: Date) {
         self.id = id

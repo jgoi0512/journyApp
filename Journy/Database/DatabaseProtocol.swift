@@ -12,7 +12,6 @@ import FirebaseAuth
 
 protocol DatabaseProtocol: NSObject {
     // Trip
-    func fetchTrips(completion: @escaping (Result<[Trip], Error>) -> Void)
     func addTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void)
     func updateTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void)
     func deleteTrip(_ trip: Trip, completion: @escaping (Result<Void, Error>) -> Void)
@@ -22,7 +21,7 @@ protocol DatabaseProtocol: NSObject {
     func fetchExpensesForTrip(_ tripID: String, completion: @escaping (Result<[Expense], Error>) -> Void)
     func addExpense(_ expense: Expense, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     func updateExpense(_ expense: Expense, completion: @escaping (Result<Void, Error>) -> Void)
-    func deleteExpense(_ expense: Expense, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
+    func deleteExpense(_ expenseID: String, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     
     // Trip flights
     func fetchFlightInfoForTrip(_ tripID: String, completion: @escaping (Result<[FlightInfo?], Error>) -> Void)
@@ -35,11 +34,10 @@ protocol DatabaseProtocol: NSObject {
     func addAccommodationToTrip(_ accommodation: Accommodation, tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     func deleteAccommodationFromTrip(_ accommodationID: String, tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     
-    // Trip destinations
-    func fetchDestinationsForTrip(_ tripID: String, completion: @escaping (Result<[Activity], Error>) -> Void)
-    func addDestination(_ destination: Activity, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
-    func updateDestination(_ destination: Activity, completion: @escaping (Result<Void, Error>) -> Void)
-    func deleteDestination(_ destination: Activity, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
+    // Trip activities
+    func fetchActivitiesForTrip(_ tripID: String, completion: @escaping (Result<[Activity], Error>) -> Void)
+    func addActivity(_ activity: Activity, toTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
+    func deleteActivity(_ activityID: String, fromTrip tripID: String, completion: @escaping (Result<Void, Error>) -> Void)
     
     // User profile
     func fetchUserProfile(completion: @escaping (Result<AuthUser, Error>) -> Void)
